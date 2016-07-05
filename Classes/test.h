@@ -32,7 +32,6 @@ public:
 	void AIshoot(Vec2 targetPos);
 	void recordUserDefault(bool isWin);
 private:
-	PhysicsWorld *p_world;
 	Size visibleSize;
 	Sprite *arrow;
 	Sprite *gift, *AIgift, *shooter, *AIshooter;
