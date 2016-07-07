@@ -94,7 +94,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 		glview = GLViewImpl::create("TestCocos");
 		director->setOpenGLView(glview);
 	}
-
+	//glview->setFrameSize(800, 480);
 	glview->setDesignResolutionSize(800, 480, ResolutionPolicy::EXACT_FIT);
 	// turn on display FPS
 	director->setDisplayStats(true);
