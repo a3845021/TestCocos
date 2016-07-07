@@ -25,7 +25,7 @@ bool Start::init()
 	this->addChild(background, 0);
 	background->setVisible(false);
 
-	auto label = Label::createWithTTF("Start", "fonts/Marker Felt.ttf", 48);
+	auto label = Label::createWithTTF("Catapult Game", "fonts/Marker Felt.ttf", 48);
 	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height));
 	this->addChild(label, 1);
 
@@ -40,10 +40,4 @@ bool Start::init()
 	this->addChild(menu, 1);
 
 	return true;
-}
-
-void Start::goTest(Ref * ref)
-{
-	auto scene = Test::createScene();
-	Director::getInstance()->replaceScene(scene);
 }

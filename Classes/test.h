@@ -21,15 +21,16 @@ public:
 	void AIshoot(Vec2 targetPos);
 	void recordUserDefault(bool isWin);
 
-	bool isTouch;
+	bool isTouch, isHit;
 	cocos2d::Label *scoreLabel, *testLabel;
 	int playScore, AIScore;
-	Sprite *arrow;
+	Sprite *arrow, *background;
 private:
 	Size visibleSize;
 	Sprite *gift, *AIgift, *shooter, *AIshooter;
 	float currentTime, startTime;
 	float AIshootTime;
+	EventListenerTouchOneByOne* touchListener;
 };
 
 #endif // !__TEST_H__

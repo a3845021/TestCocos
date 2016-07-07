@@ -7,14 +7,14 @@
 #include <cmath>
 
 #define database UserDefault::getInstance() // 本地存储实例
+#define director Director::getInstance() //导演类单例
 #define random_num RandomNum::getInstance() // 随机数单例
 #define my_action MyAction::getInstance() // MyAction存放可重用代码
 #define INIT_SPEED 250 // 实际速度为初始速度*点击时间
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
 #define PI 3.14159265 // 圆周率
-#define AI_SHOOT_TIME 2.0f // AI射击间隔
-#define AI_DEVIATION 0.5f //AI射击误差范围
+#define AI_DEVIATION 0.2f //AI射击误差范围
 #define AI_SHOOT_PLAYER_PROBABILITY 0.2f // AI射击玩家概率
 #define GIFT_SCORE 25 // 每个目标的分数
 #define G -200.0f // 重力加速度
@@ -25,13 +25,16 @@
 // 两个投石车、发射点、眩晕图标的位置
 const Vec2 playerPosition = Vec2(100, 35);
 const Vec2 shootPosition = Vec2(120, 120);
+const Vec2 playerDizzyPosition = Vec2(160, 150);
 const Vec2 AIPosition = Vec2(700, 35);
 const Vec2 AIshootPosition = Vec2(680, 120);
 const Vec2 AIdizzyPosition = Vec2(640, 150);
 
 const int ground_height = 40;
 
-float tmpAIshootTime;
+float AIshootTime = 4.0f; // AI射击间隔
+
+float tmpAIshootTime, playerDizzyTime;
 std::vector<Vec2> allGiftPos, AIAllGiftPos;
 
 /*
@@ -84,17 +87,17 @@ bool Test::init(PhysicsWorld* pw)
 	// 初始化玩家和AI分数及其他数据
 	playScore = AIScore = 0;
 	currentTime = startTime = 0;
-	tmpAIshootTime = 0.0f;
-	isTouch = false;
+	tmpAIshootTime = playerDizzyTime = 0.0f;
+	isTouch = isHit = false;
 
 	// cocos2dx计时器 
 	schedule(schedule_selector(Test::updateTime), 0.1);
 
 	// 获取当前可视窗口大小
-	visibleSize = Director::getInstance()->getVisibleSize();
+	visibleSize = director->getVisibleSize();
 
 	// 添加背景图片
-	auto background = Sprite::create("bg.jpg");
+	background = Sprite::create("bg.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(background, 0);
 
@@ -181,7 +184,7 @@ dt单位是秒
 */
 void Test::updateTime(float dt)
 {
-	visibleSize = Director::getInstance()->getVisibleSize();
+	visibleSize = director->getVisibleSize();
 	currentTime += dt;  // 计时器
 	tmpAIshootTime += dt; // 记录AI射击间隔
 
@@ -190,14 +193,22 @@ void Test::updateTime(float dt)
 	sprintf(t, "%.1f", tmpAIshootTime);
 	testLabel->setString(t);
 	*/
-
+	
+	if (isHit) {
+		playerDizzyTime += dt;
+		if (playerDizzyTime >= DIZZY_TIME) {
+			isHit = false;
+			touchEvent(); // 重新创建触控监听器
+		}
+	}
 	if (isTouch) {
 		my_action->arrowColor(arrow, this->getTouchTime());
 	}
 	// AI计时超过AI射击间隔则执行射击
-	if (tmpAIshootTime >= AI_SHOOT_TIME) {
+	if (tmpAIshootTime >= AIshootTime) {
 		tmpAIshootTime = 0.0f; // AI计时重置
 		AIshoot(AIselectTarget()); // AI射击
+		AIshootTime = random_num->getRandomNum(300, 500) / 100.0f;
 	}
 }
 
@@ -243,12 +254,12 @@ void Test::updateScore()
 void Test::touchEvent()
 {
 	// 创建监听器
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
+	touchListener = EventListenerTouchOneByOne::create();
 	// 这句话不清楚什么意思。。
-	listener->setSwallowTouches(true);
+	touchListener->setSwallowTouches(true);
 	
 	// 点击时显示箭头并旋转箭头方向，记录点击开始时间
-	listener->onTouchBegan = [this](Touch* touch, Event* e) {
+	touchListener->onTouchBegan = [this](Touch* touch, Event* e) {
 		this->setStartTime();
 		this->isTouch = true;
 		my_action->arrowRotation(this->arrow, shootPosition, touch->getLocation());
@@ -257,14 +268,14 @@ void Test::touchEvent()
 	};
 
 	// 点击移动时旋转箭头方向
-	listener->onTouchMoved = [this](Touch* touch, Event* e) {
+	touchListener->onTouchMoved = [this](Touch* touch, Event* e) {
 		my_action->arrowRotation(this->arrow, shootPosition, touch->getLocation());
 	};
 
 	// 点击结束隐藏箭头
 	// 创建炮弹实例
 	// 根据点击持续时间和方向设置炮弹的发射速度向量
-	listener->onTouchEnded = [this](Touch* touch, Event* e) {
+	touchListener->onTouchEnded = [this](Touch* touch, Event* e) {
 		this->isTouch = false;
 
 		this->arrow->setVisible(false);
@@ -282,7 +293,7 @@ void Test::touchEvent()
 	};
 
 	// 把触控监听器添加到导演事件调度
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(touchListener, background);
 }
 
 /*
@@ -417,6 +428,17 @@ void Test::contactEvent()
 			/*
 			play stop shoot 2 second
 			*/
+			isHit = true;
+			// 开始计算眩晕时间
+			playerDizzyTime = 0.0f;
+			this->arrow->setVisible(false);
+			// 眩晕效果
+			auto dizzy = my_action->createSprite("dizzy.png", 7, playerDizzyPosition);
+			my_action->addNode(this, dizzy, 5);
+			my_action->showDizzyPic(dizzy, DIZZY_TIME);
+			// 移除监听器
+			director->getEventDispatcher()->removeEventListenersForTarget(this->background);
+
 			return true;
 		}
 
@@ -437,7 +459,7 @@ void Test::contactEvent()
 	};
 
 	// 把碰撞监听器添加到导演事件调度
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
 /*
