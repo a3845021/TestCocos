@@ -6,7 +6,6 @@ private:
 	RandomNum() {
 		srand(time(0));
 	}
-	//static RandomNum* randomInstance;
 public:
 	static RandomNum* getInstance() {
 		static RandomNum instance;

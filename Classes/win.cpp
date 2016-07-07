@@ -1,9 +1,11 @@
 #include "win.h"
 #include "start.h"
 #include "test.h"
+#include "MyAction.h"
 
 USING_NS_CC;
 
+#define my_action MyAction::getInstance()
 #define database UserDefault::getInstance()
 
 cocos2d::Scene * Win::createScene()
@@ -38,25 +40,19 @@ bool Win::init()
 	label->setColor(Color3B::RED);
 	this->addChild(label, 1);
 
-	auto item1 = MenuItemLabel::create(Label::createWithTTF("Restart", "fonts/Marker Felt.ttf", 48), CC_CALLBACK_1(Win::restart, this));
+	auto item1 = MenuItemLabel::create(Label::createWithTTF("Restart", "fonts/Marker Felt.ttf", 48));
+	item1->setCallback([](Ref* ref) {
+		my_action->changeScene(Test::createScene());
+	});
 	item1->setColor(Color3B::RED);
-	auto item2 = MenuItemLabel::create(Label::createWithTTF("Back To Menu", "fonts/Marker Felt.ttf", 36), CC_CALLBACK_1(Win::backToMenu, this));
+	auto item2 = MenuItemLabel::create(Label::createWithTTF("Back To Menu", "fonts/Marker Felt.ttf", 36));
+	item2->setCallback([](Ref* ref) {
+		my_action->changeScene(Start::createScene());
+	});
 	auto menu = Menu::create(item1, item2, NULL);
 	menu->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	menu->alignItemsVerticallyWithPadding(20);
 	this->addChild(menu, 1);
 
 	return true;
-}
-
-void Win::backToMenu(Ref * ref)
-{
-	auto scene = Start::createScene();
-	Director::getInstance()->replaceScene(scene);
-}
-
-void Win::restart(Ref * ref)
-{
-	auto scene = Test::createScene();
-	Director::getInstance()->replaceScene(scene);
 }

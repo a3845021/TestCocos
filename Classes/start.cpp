@@ -1,5 +1,8 @@
 #include "start.h"
 #include "test.h"
+#include "MyAction.h"
+
+#define my_action MyAction::getInstance()
 
 cocos2d::Scene * Start::createScene()
 {
@@ -26,7 +29,10 @@ bool Start::init()
 	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height));
 	this->addChild(label, 1);
 
-	auto item = MenuItemLabel::create(Label::createWithTTF("Test", "fonts/Marker Felt.ttf", 80), CC_CALLBACK_1(Start::goTest, this));
+	auto item = MenuItemLabel::create(Label::createWithTTF("Test", "fonts/Marker Felt.ttf", 80));
+	item->setCallback([](Ref* ref) {
+		my_action->changeScene(Test::createScene());
+	});
 	auto menu = Menu::create(item, NULL);
 	menu->setColor(Color3B::RED);
 	menu->setPosition(visibleSize.width / 2, visibleSize.height / 2);

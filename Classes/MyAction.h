@@ -19,7 +19,7 @@ public:
 	cocos2d::Sprite* createSprite(std::string file_name, int tag, Vec2 position, Vec2 anchorPoint, cocos2d::PhysicsBody* physics_body = NULL, bool dynamic = true);
 	void addNode(cocos2d::Layer* layer, cocos2d::Node* node, int localZOrder);
 	void shootAction(cocos2d::Layer* layer, Vec2 shootVelocity, cocos2d::Sprite* bullet, int localZOrder);
-	cocos2d::Vec2 calAIShootVelocity(cocos2d::Vec2 shootPos, cocos2d::Vec2 targetPos, float g);
+	cocos2d::Vec2 calAIShootVelocity(cocos2d::Vec2 shootPos, cocos2d::Vec2 targetPos, float g, float random_range = 0.0f);
 	cocos2d::Vec2 calPlayerShootVelocity(cocos2d::Vec2 shootPos, cocos2d::Vec2 targetPos, int init_speed, float touch_time);
 	void spriteFadeOut(cocos2d::Sprite* sprite);
 	void addScore(int& score, const int add_score);

@@ -1,15 +1,18 @@
 #include "MyAction.h"
+#include "RandomNum.h"
 
+#define random_num RandomNum::getInstance()
 #define director Director::getInstance()
 #define PI 3.14159265 // 圆周率
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define MAX_UINT 0xFFFFFFFF
 
 /*
-更换场景
+更换场景  过场动画体验不好。。。
 */
 void MyAction::changeScene(cocos2d::Scene * scene)
 {
+	//auto reScene = CCTransitionProgressInOut::create(1.0f, scene);
 	director->replaceScene(scene);
 }
 
@@ -80,12 +83,21 @@ void MyAction::shootAction(cocos2d::Layer * layer, Vec2 shootVelocity, cocos2d::
 
 /*
 计算AI发射Velocity
+random_range取值范围：[0, 1)
+eg：random_range=0.1代表实际速度=准确速度*[0.9, 1.1]
 */
-cocos2d::Vec2 MyAction::calAIShootVelocity(cocos2d::Vec2 shootPos, cocos2d::Vec2 targetPos, float g)
+cocos2d::Vec2 MyAction::calAIShootVelocity(cocos2d::Vec2 shootPos, cocos2d::Vec2 targetPos, float g, float random_range)
 {
 	float t = sqrt(2 * (shootPos.x + shootPos.y - targetPos.x - targetPos.y) / g);
 	float vx = (shootPos.x - targetPos.x) / t;
 	float vy = vx;
+	if (random_range > 0 && random_range < 1) {
+		int t = (int)(random_range * 1000);
+		int r1 = random_num->getRandomNum(-t, t);
+		int r2 = random_num->getRandomNum(-t, t);
+		float k1 = 1 + (r1 / 1000.0f), k2 = 1 + (r2 / 1000.0f);
+		return Vec2(-vx * k1, vy * k2);
+	}
 	return Vec2(-vx, vy);
 }
 

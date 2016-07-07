@@ -10,8 +10,6 @@ public:
 	static cocos2d::Scene* createScene();
 	static Test* create(PhysicsWorld* pw);
 	virtual bool init(PhysicsWorld* pw);
-	//CREATE_FUNC(Test);
-	void goBack(Ref* ref);
 	void updateTime(float dt);
 	void setStartTime();
 	float getTouchTime();
@@ -22,6 +20,7 @@ public:
 	Vec2 AIselectTarget();
 	void AIshoot(Vec2 targetPos);
 	void recordUserDefault(bool isWin);
+
 	bool isTouch;
 	cocos2d::Label *scoreLabel, *testLabel;
 	int playScore, AIScore;

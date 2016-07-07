@@ -13,7 +13,9 @@
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
 #define PI 3.14159265 // 圆周率
-#define AI_SHOOT_TIME 5.0f // AI射击间隔
+#define AI_SHOOT_TIME 2.0f // AI射击间隔
+#define AI_DEVIATION 0.5f //AI射击误差范围
+#define AI_SHOOT_PLAYER_PROBABILITY 0.2f // AI射击玩家概率
 #define GIFT_SCORE 25 // 每个目标的分数
 #define G -200.0f // 重力加速度
 #define TARGET_SCORE 100 // 目标分数
@@ -105,18 +107,23 @@ bool Test::init(PhysicsWorld* pw)
 	my_action->addNode(this, brick, 1);
 
 	// Back按钮
-	auto item = MenuItemLabel::create(Label::createWithTTF("Back", MARKER_FELT_TTF, 36), CC_CALLBACK_1(Test::goBack, this));
+	auto item = MenuItemLabel::create(Label::createWithTTF("Back", MARKER_FELT_TTF, 36));
+	item->setCallback([](Ref* ref) {
+		my_action->changeScene(Start::createScene());
+	});
 	auto menu = Menu::create(item, NULL);
 	menu->setPosition(item->getContentSize().width / 2, item->getContentSize().height / 2);
 	menu->setColor(Color3B::BLACK);
 	this->addChild(menu, 5);
 
 	// 添加玩家投石机  设置锚点为Sprite的左下角
-	shooter = my_action->createSprite("shooter.png", 3, playerPosition, Vec2(0, 0), PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(20, -20)), false);
+	shooter = my_action->createSprite("shooter.png", 3, playerPosition, Vec2(0, 0), 
+		PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(20, -20)), false);
 	my_action->addNode(this, shooter, 2);
 
 	// 添加AI投石机  设置锚点为Sprite的右下角
-	AIshooter = my_action->createSprite("AIshooter.png", 6, AIPosition, Vec2(1, 0), PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(-20, -20)), false);
+	AIshooter = my_action->createSprite("AIshooter.png", 6, AIPosition, Vec2(1, 0), 
+		PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(-20, -20)), false);
 	my_action->addNode(this, AIshooter, 2);
 
 	// 添加箭头，用于蓄力显示
@@ -164,15 +171,6 @@ bool Test::init(PhysicsWorld* pw)
 	contactEvent();
 
 	return true;
-}
-
-/*
-返回按钮回调函数
-点击则切换回start界面
-*/
-void Test::goBack(Ref * ref)
-{
-	my_action->changeScene(Start::createScene());
 }
 
 /*
@@ -391,7 +389,7 @@ void Test::contactEvent()
 			return true;
 		}
 
-		// 玩家炮弹命中AI投石机 AI投石机眩晕（.未实现.）
+		// 玩家炮弹命中AI投石机 AI投石机眩晕
 		if ((A->getTag() == 1 && B->getTag() == 6) || (A->getTag() == 6 && B->getTag() == 1)) {
 			if (A->getTag() == 1) {
 				my_action->spriteFadeOut(A);
@@ -455,8 +453,8 @@ AI选择攻击目标，有20%概率攻击玩家投石机
 */
 Vec2 Test::AIselectTarget()
 {
-	int random = random_num->getRandomNum(10);
-	if (random < 2) return shooter->getPosition();
+	int random = random_num->getRandomNum(1000);
+	if (random < (int)(1000 * AI_SHOOT_PLAYER_PROBABILITY)) return shooter->getPosition();
 	return AIAllGiftPos[random_num->getRandomNum(AIAllGiftPos.size())];
 }
 
@@ -466,7 +464,7 @@ Vec2 Test::AIselectTarget()
 */
 void Test::AIshoot(Vec2 targetPos)
 {
-	auto v = my_action->calAIShootVelocity(AIshootPosition, targetPos, -G);
+	auto v = my_action->calAIShootVelocity(AIshootPosition, targetPos, -G, AI_DEVIATION);
 	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(20.0f));
 	my_action->shootAction(this, v, new_ball, 1);
 }
