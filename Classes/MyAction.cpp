@@ -1,6 +1,7 @@
 #include "MyAction.h"
 #include "RandomNum.h"
 
+#define database UserDefault::getInstance() // 本地存储实例
 #define random_num RandomNum::getInstance()
 #define director Director::getInstance()
 #define PI 3.14159265 // 圆周率
@@ -137,6 +138,19 @@ void MyAction::addScore(int & score, const int add_score)
 }
 
 /*
+清除所有bullet
+*/
+void MyAction::distroyAllBullet(cocos2d::Vector<Sprite*>* playerBullet, cocos2d::Vector<Sprite*>* AIBullet)
+{
+	for (auto bullet : *playerBullet)
+		spriteFadeOut(bullet);
+	for (auto bullet : *AIBullet)
+		spriteFadeOut(bullet);
+	playerBullet->clear();
+	AIBullet->clear();
+}
+
+/*
 更新分数面板
 */
 void MyAction::updateLabelScore(cocos2d::Label * score_label, int player_score, int AI_score, char * label_format)
@@ -144,6 +158,16 @@ void MyAction::updateLabelScore(cocos2d::Label * score_label, int player_score, 
 	char t[30];
 	sprintf(t, label_format, player_score, AI_score);
 	score_label->setString(t);
+}
+
+/*
+更新时间面板
+*/
+void MyAction::updateLabelTime(cocos2d::Label * time_label, float currentTime, float totalTime)
+{
+	char t[30];
+	sprintf(t, "%.1f", totalTime - currentTime);
+	time_label->setString(t);
 }
 
 /*
@@ -194,4 +218,15 @@ void MyAction::showDizzyPic(cocos2d::Sprite * sprite, float dizzy_time)
 	auto rotateBy = RotateBy::create(dizzy_time, 1440);
 	sprite->runAction(Sequence::create(rotateBy,
 		CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, sprite)), NULL));
+}
+
+/*
+判定游戏结果
+playerScore > AIScore 则玩家获胜
+否则AI获胜
+*/
+void MyAction::judgeWin(int playerScore, int AIScore)
+{
+	if (playerScore > AIScore) database->setBoolForKey("isWin", true);
+	else database->setBoolForKey("isWin", false);
 }

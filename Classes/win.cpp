@@ -1,6 +1,7 @@
 #include "win.h"
 #include "start.h"
 #include "test.h"
+#include "SelectScene.h"
 #include "MyAction.h"
 
 USING_NS_CC;
@@ -49,7 +50,11 @@ bool Win::init()
 	item2->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
 	});
-	auto menu = Menu::create(item1, item2, NULL);
+	auto item3 = MenuItemLabel::create(Label::createWithTTF("Back To Select Scene", "fonts/Marker Felt.ttf", 36));
+	item3->setCallback([](Ref* ref) {
+		my_action->changeScene(SelectScene::createScene());
+	});
+	auto menu = Menu::create(item1, item3, item2, NULL);
 	menu->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	menu->alignItemsVerticallyWithPadding(20);
 	this->addChild(menu, 1);

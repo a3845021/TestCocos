@@ -13,16 +13,14 @@ public:
 	void updateTime(float dt);
 	void setStartTime();
 	float getTouchTime();
-	void updateScore();
 	void touchEvent();
 	void contactEvent();
 	void gameOver();
 	Vec2 AIselectTarget();
 	void AIshoot(Vec2 targetPos);
-	void recordUserDefault(bool isWin);
 
 	bool isTouch, isHit;
-	cocos2d::Label *scoreLabel, *testLabel;
+	cocos2d::Label *scoreLabel, *timeLabel, *testLabel;
 	int playScore, AIScore;
 	Sprite *arrow, *background;
 private:

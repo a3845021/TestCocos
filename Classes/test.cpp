@@ -6,14 +6,14 @@
 #include <vector>
 #include <cmath>
 
-#define database UserDefault::getInstance() // 本地存储实例
 #define director Director::getInstance() //导演类单例
 #define random_num RandomNum::getInstance() // 随机数单例
 #define my_action MyAction::getInstance() // MyAction存放可重用代码
-#define INIT_SPEED 250 // 实际速度为初始速度*点击时间
+
+#define GAME_TIME 60.0f
+#define INIT_SPEED 300 // 实际速度为初始速度*点击时间
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
-#define PI 3.14159265 // 圆周率
 #define AI_DEVIATION 0.2f //AI射击误差范围
 #define AI_SHOOT_PLAYER_PROBABILITY 0.2f // AI射击玩家概率
 #define GIFT_SCORE 25 // 每个目标的分数
@@ -30,12 +30,13 @@ const Vec2 AIPosition = Vec2(700, 35);
 const Vec2 AIshootPosition = Vec2(680, 120);
 const Vec2 AIdizzyPosition = Vec2(640, 150);
 
-const int ground_height = 40;
+const int ground_height = 40; // 地面高度
 
 float AIshootTime = 4.0f; // AI射击间隔
 
 float tmpAIshootTime, playerDizzyTime;
 std::vector<Vec2> allGiftPos, AIAllGiftPos;
+cocos2d::Vector<Sprite*> allPlayerBullet, allAIBullet;
 
 /*
 创建带物理引擎的场景
@@ -115,7 +116,7 @@ bool Test::init(PhysicsWorld* pw)
 		my_action->changeScene(Start::createScene());
 	});
 	auto menu = Menu::create(item, NULL);
-	menu->setPosition(item->getContentSize().width / 2, item->getContentSize().height / 2);
+	menu->setPosition(visibleSize.width - menu->getContentSize().width / 2, item->getContentSize().height);
 	menu->setColor(Color3B::BLACK);
 	this->addChild(menu, 5);
 
@@ -150,7 +151,7 @@ bool Test::init(PhysicsWorld* pw)
 	char c[30];
 	sprintf(c, "Target:%d", TARGET_SCORE);
 	auto targetLabel = Label::createWithTTF(c, MARKER_FELT_TTF, 36);
-	targetLabel->setPosition(visibleSize.width / 2, visibleSize.height - targetLabel->getContentSize().height / 2);
+	targetLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + targetLabel->getContentSize().height);
 	targetLabel->setColor(Color3B::RED);
 	this->addChild(targetLabel, 5);
 
@@ -162,10 +163,16 @@ bool Test::init(PhysicsWorld* pw)
 
 	// 显示双方分数
 	scoreLabel = Label::createWithTTF(SCORE_FORMAT, MARKER_FELT_TTF, 36);
-	scoreLabel->setPosition(visibleSize.width / 2, visibleSize.height - scoreLabel->getContentSize().height * 3 / 2);
+	scoreLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	scoreLabel->setColor(Color3B::BLACK);
-	updateScore();
+	my_action->updateLabelScore(scoreLabel, playScore, AIScore, SCORE_FORMAT);
 	this->addChild(scoreLabel, 5);
+
+	// 显示剩余时间
+	timeLabel = Label::createWithTTF("60.0", MARKER_FELT_TTF, 36);
+	timeLabel->setPosition(visibleSize.width / 2, visibleSize.height - timeLabel->getContentSize().height);
+	timeLabel->setColor(Color3B::BLUE);
+	this->addChild(timeLabel, 5);
 
 	// 触控事件
 	touchEvent();
@@ -187,6 +194,20 @@ void Test::updateTime(float dt)
 	visibleSize = director->getVisibleSize();
 	currentTime += dt;  // 计时器
 	tmpAIshootTime += dt; // 记录AI射击间隔
+
+	// 更新时间面板
+	my_action->updateLabelTime(timeLabel, currentTime, GAME_TIME);
+	// 剩余时间为0则游戏结束
+	if (currentTime >= GAME_TIME) {
+		my_action->judgeWin(playScore, AIScore);
+		my_action->changeScene(Win::createScene()); // 跳转到结束界面
+	}
+
+	// 判断分数是否到达目标
+	if (playScore >= TARGET_SCORE || AIScore >= TARGET_SCORE) {
+		my_action->judgeWin(playScore, AIScore);
+		my_action->changeScene(Win::createScene()); // 跳转到结束界面
+	}
 
 	// test
 	/*char t[30];
@@ -226,25 +247,6 @@ void Test::setStartTime()
 float Test::getTouchTime()
 {
 	return currentTime - startTime;
-}
-
-/*
-更新分数面板
-如果任意一方达到目标分数，则游戏结束
-跳转到结束界面
-*/
-void Test::updateScore()
-{
-	my_action->updateLabelScore(scoreLabel, playScore, AIScore, SCORE_FORMAT);
-	if (playScore >= TARGET_SCORE || AIScore >= TARGET_SCORE) {
-		if (playScore >= TARGET_SCORE) {
-			recordUserDefault(true); // 使用本地记录本次游戏结果
-		}
-		else {
-			recordUserDefault(false); // 使用本地记录本次游戏结果
-		}
-		gameOver(); // 跳转到结束界面
-	}
 }
 
 /*
@@ -370,7 +372,7 @@ void Test::contactEvent()
 			my_action->spriteFadeOut(B);
 			my_action->showPerScore(giftPosition, GIFT_SCORE, this);
 			my_action->addScore(this->playScore, GIFT_SCORE);
-			this->updateScore();
+			my_action->updateLabelScore(scoreLabel, playScore, AIScore, SCORE_FORMAT);
 			return true;
 		}
 
@@ -396,7 +398,7 @@ void Test::contactEvent()
 			my_action->spriteFadeOut(B);
 			my_action->showPerScore(giftPosition, GIFT_SCORE, this);
 			my_action->addScore(this->AIScore, GIFT_SCORE);
-			this->updateScore();
+			my_action->updateLabelScore(scoreLabel, playScore, AIScore, SCORE_FORMAT);
 			return true;
 		}
 
@@ -489,12 +491,4 @@ void Test::AIshoot(Vec2 targetPos)
 	auto v = my_action->calAIShootVelocity(AIshootPosition, targetPos, -G, AI_DEVIATION);
 	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(20.0f));
 	my_action->shootAction(this, v, new_ball, 1);
-}
-
-/*
-本地保存游戏数据
-*/
-void Test::recordUserDefault(bool isWin)
-{
-	database->setBoolForKey("isWin", isWin);
 }
