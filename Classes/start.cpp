@@ -2,6 +2,8 @@
 #include "SelectScene.h"
 #include "test.h"
 #include "MyAction.h"
+#include "HelpScene.h"
+#include "AboutScene.h"
 
 #define my_action MyAction::getInstance()
 
@@ -39,13 +41,13 @@ bool Start::init()
 	auto helpItem = MenuItemLabel::create(Label::createWithTTF("Help", "fonts/Marker Felt.ttf", 40));
 	helpItem->setCallback([](Ref* ref) {
 		// 帮助页面
-		// my_action->changeScene(HelpScene::createScene());
+		my_action->changeScene(HelpScene::createScene());
 	});
 
 	auto aboutItem = MenuItemLabel::create(Label::createWithTTF("About", "fonts/Marker Felt.ttf", 40));
 	aboutItem->setCallback([](Ref* ref) {
 		// 关于页面
-		// my_action->changeScene(AboutScene::createScene());
+		my_action->changeScene(AboutScene::createScene());
 	});
 
 	auto quitItem = MenuItemLabel::create(Label::createWithTTF("Quit", "fonts/Marker Felt.ttf", 40));

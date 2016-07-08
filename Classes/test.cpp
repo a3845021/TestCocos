@@ -116,7 +116,7 @@ bool Test::init(PhysicsWorld* pw)
 		my_action->changeScene(Start::createScene());
 	});
 	auto menu = Menu::create(item, NULL);
-	menu->setPosition(visibleSize.width - menu->getContentSize().width / 2, item->getContentSize().height);
+	menu->setPosition(item->getContentSize().width, visibleSize.height - item->getContentSize().height);
 	menu->setColor(Color3B::BLACK);
 	this->addChild(menu, 5);
 
