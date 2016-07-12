@@ -13,6 +13,7 @@ public:
 		static MyAction instance;
 		return &instance;
 	}
+	void preLoad();
 	void changeScene(cocos2d::Scene* scene);
 	cocos2d::Node* createNode(int tag, cocos2d::PhysicsBody* physics_body = NULL, bool dynamic = true);
 	cocos2d::Sprite* createSprite(std::string file_name, int tag, Vec2 position, cocos2d::PhysicsBody* physics_body = NULL, bool dynamic = true);
@@ -31,6 +32,7 @@ public:
 	void arrowColor(cocos2d::Sprite* arrow, float touchTime);
 	void showDizzyPic(cocos2d::Sprite* sprite, float dizzy_time);
 	void judgeWin(int playerScore, int AIScore);
+	const char* getChinese(char* file_name, char* key_name);
 };
 
 #endif // !__MY_ACTION_H__

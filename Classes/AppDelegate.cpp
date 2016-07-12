@@ -1,6 +1,10 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "start.h"
+#include "MyAction.h"
+
+#define ANIMATION_FRAME 6
+#define ANIMATION_PER_FRAME_TIME 0.05f
 
 USING_NS_CC;
 
@@ -103,6 +107,14 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	// set FPS. the default value is 1.0/60 if you don't call this
 	director->setAnimationInterval(1.0 / 60);
 
+	/*
+	预加载动画
+	*/
+	MyAction::getInstance()->preLoad();
+
+	/*
+	加载开始页面
+	*/
 	auto scene = Start::createScene();
 	director->runWithScene(scene);
 

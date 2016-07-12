@@ -35,6 +35,10 @@ bool Win::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
+	/*
+	Ìí¼Ó±³¾°Í¼
+	*/
+
 	auto label = Label::createWithTTF("You Win!!", "fonts/Marker Felt.ttf", 60);
 	if (!isWin) label->setString("You Lose..");
 	label->setPosition(visibleSize.width / 2, visibleSize.height - label->getContentSize().height);

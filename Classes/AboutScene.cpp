@@ -34,5 +34,16 @@ bool AboutScene::init()
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(label);
 
+	/*auto shooter = Sprite::create("shooter.png");
+	Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));
+	shooter->runAction(RepeatForever::create(shooterAnimate));
+	shooter->setAnchorPoint(Vec2(0, 0));
+	shooter->setPosition(Vec2(100, 35));
+	this->addChild(shooter, 2);
+
+	auto ball = Sprite::create("bullet.png");
+	ball->setPosition(Vec2(150, 150));
+	this->addChild(ball, 2);*/
+
 	return true;
 }

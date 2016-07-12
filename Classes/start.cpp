@@ -22,11 +22,14 @@ bool Start::init()
 		return false;
 	}
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-
+	
+	/*
+	Ìí¼Ó±³¾°Í¼
 	auto background = Sprite::create("bg.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(background, 0);
-	background->setVisible(false);
+	//background->setVisible(false);
+	*/
 
 	auto label = Label::createWithTTF("Catapult Game", "fonts/Marker Felt.ttf", 48);
 	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height));

@@ -11,7 +11,7 @@
 #define my_action MyAction::getInstance() // MyAction存放可重用代码
 
 #define GAME_TIME 60.0f
-#define INIT_SPEED 300 // 实际速度为初始速度*点击时间
+#define INIT_SPEED 250 // 实际速度为初始速度*点击时间
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
 #define AI_DEVIATION 0.2f //AI射击误差范围
@@ -21,13 +21,14 @@
 #define TARGET_SCORE 100 // 目标分数
 #define SCORE_FORMAT "Score:%d  AIScore:%d" // 分数字符串
 #define MARKER_FELT_TTF "fonts/Marker Felt.ttf" // 字体路径
+#define BALL_RADIUS 18.0f // 炮弹半径
 
 // 两个投石车、发射点、眩晕图标的位置
 const Vec2 playerPosition = Vec2(100, 35);
-const Vec2 shootPosition = Vec2(120, 120);
+const Vec2 shootPosition = Vec2(150, 150);
 const Vec2 playerDizzyPosition = Vec2(160, 150);
 const Vec2 AIPosition = Vec2(700, 35);
-const Vec2 AIshootPosition = Vec2(680, 120);
+const Vec2 AIshootPosition = Vec2(650, 150);
 const Vec2 AIdizzyPosition = Vec2(640, 150);
 
 const int ground_height = 40; // 地面高度
@@ -92,7 +93,7 @@ bool Test::init(PhysicsWorld* pw)
 	isTouch = isHit = false;
 
 	// cocos2dx计时器 
-	schedule(schedule_selector(Test::updateTime), 0.1);
+	schedule(schedule_selector(Test::updateTime), 0.05);
 
 	// 获取当前可视窗口大小
 	visibleSize = director->getVisibleSize();
@@ -137,13 +138,13 @@ bool Test::init(PhysicsWorld* pw)
 
 	// 添加玩家的target
 	for (auto pos : allGiftPos) {
-		auto gift = my_action->createSprite("gift.png", 2, pos, PhysicsBody::createCircle(50.0f), false);
+		auto gift = my_action->createSprite("gift.png", 2, pos, PhysicsBody::createCircle(45.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
 	// 添加AI的target
 	for (auto pos : AIAllGiftPos) {
-		auto gift = my_action->createSprite("AIgift.png", 5, pos, PhysicsBody::createCircle(50.0f), false);
+		auto gift = my_action->createSprite("AIgift.png", 5, pos, PhysicsBody::createCircle(45.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
@@ -228,8 +229,14 @@ void Test::updateTime(float dt)
 	// AI计时超过AI射击间隔则执行射击
 	if (tmpAIshootTime >= AIshootTime) {
 		tmpAIshootTime = 0.0f; // AI计时重置
-		AIshoot(AIselectTarget()); // AI射击
-		AIshootTime = random_num->getRandomNum(300, 500) / 100.0f;
+		AItarget = AIselectTarget();
+
+		this->AIshooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("AIAnimation")),
+			CCCallFunc::create(CC_CALLBACK_0(Test::AIshoot, this)),
+			Animate::create(AnimationCache::getInstance()->getAnimation("AIAfterShoot")), NULL));
+
+		//AIshoot(AIselectTarget()); // AI射击
+		AIshootTime = random_num->getRandomNum(300, 500) / 100.0f; // AI射击频率为随机3-5S
 	}
 }
 
@@ -263,6 +270,7 @@ void Test::touchEvent()
 	// 点击时显示箭头并旋转箭头方向，记录点击开始时间
 	touchListener->onTouchBegan = [this](Touch* touch, Event* e) {
 		this->setStartTime();
+		this->arrow->setColor(Color3B(255, 255, 255));
 		this->isTouch = true;
 		my_action->arrowRotation(this->arrow, shootPosition, touch->getLocation());
 		this->arrow->setVisible(true);
@@ -284,14 +292,18 @@ void Test::touchEvent()
 		this->arrow->setColor(Color3B(255, 255, 255));
 
 		float touchTime = this->getTouchTime();
-
+		this->touchLocation = touch->getLocation();
 		//this->setMousePosition(touch->getLocation());
 
-		auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(20.0f));
+		//shooter animation
+		//Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));
+		this->shooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation")),
+			CCCallFunc::create(CC_CALLBACK_0(Test::playShoot, this)), 
+			Animate::create(AnimationCache::getInstance()->getAnimation("playerAfterShoot")), NULL));
+
+		/*auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(20.0f));
 		Vec2 v = my_action->calPlayerShootVelocity(shootPosition, touch->getLocation(), INIT_SPEED, this->getTouchTime());
-		my_action->shootAction(this, v, new_ball, 1);
-		//my_action->shootAction(this, this->getShootVelocity(), new_ball, 1);
-		return true;
+		my_action->shootAction(this, v, new_ball, 1);*/
 	};
 
 	// 把触控监听器添加到导演事件调度
@@ -434,6 +446,7 @@ void Test::contactEvent()
 			// 开始计算眩晕时间
 			playerDizzyTime = 0.0f;
 			this->arrow->setVisible(false);
+			this->arrow->setColor(Color3B(255, 255, 255));
 			// 眩晕效果
 			auto dizzy = my_action->createSprite("dizzy.png", 7, playerDizzyPosition);
 			my_action->addNode(this, dizzy, 5);
@@ -465,14 +478,6 @@ void Test::contactEvent()
 }
 
 /*
-游戏结束跳转到结束界面
-*/
-void Test::gameOver()
-{
-	my_action->changeScene(Win::createScene());
-}
-
-/*
 AI选择攻击目标，有20%概率攻击玩家投石机
 */
 Vec2 Test::AIselectTarget()
@@ -486,9 +491,21 @@ Vec2 Test::AIselectTarget()
 创建AI炮弹，攻击目标
 没有误差机制，必命中
 */
-void Test::AIshoot(Vec2 targetPos)
+void Test::AIshoot()
 {
-	auto v = my_action->calAIShootVelocity(AIshootPosition, targetPos, -G, AI_DEVIATION);
-	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(20.0f));
+	auto v = my_action->calAIShootVelocity(AIshootPosition, AItarget, -G, AI_DEVIATION);
+	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(BALL_RADIUS));
+	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, -360)));
+	my_action->shootAction(this, v, new_ball, 1);
+}
+
+/*
+创建player炮弹，攻击目标
+*/
+void Test::playShoot()
+{
+	auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(BALL_RADIUS));
+	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, 360)));
+	Vec2 v = my_action->calPlayerShootVelocity(shootPosition, touchLocation, INIT_SPEED, this->getTouchTime());
 	my_action->shootAction(this, v, new_ball, 1);
 }

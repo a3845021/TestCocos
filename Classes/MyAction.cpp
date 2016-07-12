@@ -7,6 +7,47 @@
 #define PI 3.14159265 // 圆周率
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define MAX_UINT 0xFFFFFFFF
+#define ANIMATION_FRAME 6
+#define ANIMATION_PER_FRAME_TIME 0.05f
+
+/*
+预加载(动画，背景音乐)
+*/
+void MyAction::preLoad()
+{
+	// play动画加载
+	auto texture = Director::getInstance()->getTextureCache()->addImage("shooter_animation.png");
+	Vector<SpriteFrame*> animFrames(ANIMATION_FRAME);
+	for (int i = 0; i < ANIMATION_FRAME; i++) {
+		auto frame = SpriteFrame::createWithTexture(texture, Rect(100 * i, 0, 100, 150));
+		animFrames.pushBack(frame);
+	}
+	auto animation = Animation::createWithSpriteFrames(animFrames, ANIMATION_PER_FRAME_TIME);
+	AnimationCache::getInstance()->addAnimation(animation, "playerAnimation");
+	Vector<SpriteFrame*> tmpFrames(2);
+	for (int i = 5; i < 7; i++) {
+		auto frame = SpriteFrame::createWithTexture(texture, Rect(100 * i, 0, 100, 150));
+		tmpFrames.pushBack(frame);
+	}
+	auto tmpAnimation = Animation::createWithSpriteFrames(tmpFrames, ANIMATION_PER_FRAME_TIME);
+	AnimationCache::getInstance()->addAnimation(tmpAnimation, "playerAfterShoot");
+	// AI动画加载
+	auto AItexture = Director::getInstance()->getTextureCache()->addImage("AIshooter_animation.png");
+	Vector<SpriteFrame*> AIanim(ANIMATION_FRAME);
+	for (int i = ANIMATION_FRAME; i >= 1; i--) {
+		auto frame = SpriteFrame::createWithTexture(AItexture, Rect(100 * i, 0, 100, 150));
+		AIanim.pushBack(frame);
+	}
+	auto AIanimation = Animation::createWithSpriteFrames(AIanim, ANIMATION_PER_FRAME_TIME);
+	AnimationCache::getInstance()->addAnimation(AIanimation, "AIAnimation");
+	Vector<SpriteFrame*> tmpAIFrames(2);
+	for (int i = 1; i >= 0; i--) {
+		auto frame = SpriteFrame::createWithTexture(AItexture, Rect(100 * i, 0, 100, 150));
+		tmpAIFrames.pushBack(frame);
+	}
+	auto tmpAIAnimation = Animation::createWithSpriteFrames(tmpAIFrames, ANIMATION_PER_FRAME_TIME);
+	AnimationCache::getInstance()->addAnimation(tmpAIAnimation, "AIAfterShoot");
+}
 
 /*
 更换场景  过场动画体验不好。。。
@@ -229,4 +270,15 @@ void MyAction::judgeWin(int playerScore, int AIScore)
 {
 	if (playerScore > AIScore) database->setBoolForKey("isWin", true);
 	else database->setBoolForKey("isWin", false);
+}
+
+/*
+读取xml文件获取中文字符串
+没有相应字体库- -
+*/
+const char * MyAction::getChinese(char * file_name, char * key_name)
+{
+	Dictionary* dic = Dictionary::createWithContentsOfFile(file_name);
+	String* strchinese = (String*)dic->objectForKey(key_name);
+	return strchinese->getCString();
 }

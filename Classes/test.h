@@ -15,17 +15,18 @@ public:
 	float getTouchTime();
 	void touchEvent();
 	void contactEvent();
-	void gameOver();
 	Vec2 AIselectTarget();
-	void AIshoot(Vec2 targetPos);
+	void AIshoot();
+	void playShoot();
 
+	Vec2 touchLocation, AItarget;
 	bool isTouch, isHit;
 	cocos2d::Label *scoreLabel, *timeLabel, *testLabel;
 	int playScore, AIScore;
-	Sprite *arrow, *background;
+	Sprite *arrow, *background, *shooter, *AIshooter;
 private:
 	Size visibleSize;
-	Sprite *gift, *AIgift, *shooter, *AIshooter;
+	Sprite *gift, *AIgift;
 	float currentTime, startTime;
 	float AIshootTime;
 	EventListenerTouchOneByOne* touchListener;

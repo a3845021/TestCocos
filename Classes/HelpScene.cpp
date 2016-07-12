@@ -21,6 +21,12 @@ bool HelpScene::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
+	/*
+	增加背景图
+	帮助界面的文字
+	cocos2dx好像不支持中文的label。
+	*/
+
 	auto back = MenuItemLabel::create(Label::createWithTTF("Back", "fonts/Marker Felt.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
@@ -30,8 +36,9 @@ bool HelpScene::init()
 	backMenu->setPosition(back->getContentSize().width, visibleSize.height - back->getContentSize().height);
 	this->addChild(backMenu, 1);
 
-	auto label = Label::createWithTTF("Help Scene", "fonts/Marker Felt.ttf", 60);
-	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	auto label = Label::createWithTTF("Help Scene", "fonts/arial.ttf", 60);
+	// label->setString(my_action->getChinese("chineseXML/HelpScene.xml", "HelpTitle"));
+	label->setPosition(visibleSize.width / 2, visibleSize.height * 5 / 6);
 	this->addChild(label);
 
 	return true;

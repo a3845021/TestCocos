@@ -22,17 +22,21 @@ bool SelectScene::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
+	/*
+	Ìí¼Ó±³¾°Í¼¡£
+	*/
+
 	auto image1 = MenuItemImage::create("simple.png", "simple.png");
 	image1->setCallback([](Ref* ref) {
 		my_action->changeScene(Test::createScene());
 	});
 	auto image2 = MenuItemImage::create("medium.png", "medium.png");
 	image2->setCallback([](Ref* ref) {
-		// my_action->changeScene(Test::createScene());
+		// my_action->changeScene(::createScene());
 	});
 	auto image3 = MenuItemImage::create("hard.png", "hard.png");
 	image3->setCallback([](Ref* ref) {
-		// my_action->changeScene(Test::createScene());
+		// my_action->changeScene(::createScene());
 	});
 
 	auto menu = Menu::create(image1, image2, image3, NULL);
