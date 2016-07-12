@@ -28,11 +28,23 @@ bool AboutScene::init()
 	back->setColor(Color3B::WHITE);
 	auto backMenu = Menu::create(back, NULL);
 	backMenu->setPosition(back->getContentSize().width, visibleSize.height - back->getContentSize().height);
-	this->addChild(backMenu, 1);
+	this->addChild(backMenu, 5);
 
-	auto label = Label::createWithTTF("About Scene", "fonts/Marker Felt.ttf", 60);
+	auto about = Sprite::create("about.png");
+	about->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(about, 2);
+
+	auto version = Label::createWithTTF("Version:1.0", "fonts/Marker Felt.ttf", 36);
+	version->setPosition(visibleSize.width / 2, visibleSize.height / 3);
+	this->addChild(version, 2);
+
+	auto updateTime = Label::createWithTTF("Update Time:2016.07.12", "fonts/Marker Felt.ttf", 36);
+	updateTime->setPosition(visibleSize.width / 2, visibleSize.height / 3 - version->getContentSize().height);
+	this->addChild(updateTime, 2);
+
+	/*auto label = Label::createWithTTF("About Scene", "fonts/Marker Felt.ttf", 60);
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	this->addChild(label);
+	this->addChild(label);*/
 
 	/*auto shooter = Sprite::create("shooter.png");
 	Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));

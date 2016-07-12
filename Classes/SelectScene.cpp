@@ -26,15 +26,15 @@ bool SelectScene::init()
 	Ìí¼Ó±³¾°Í¼¡£
 	*/
 
-	auto image1 = MenuItemImage::create("simple.png", "simple.png");
+	auto image1 = MenuItemImage::create("simple.png", "simple_selected.png");
 	image1->setCallback([](Ref* ref) {
 		my_action->changeScene(Test::createScene());
 	});
-	auto image2 = MenuItemImage::create("medium.png", "medium.png");
+	auto image2 = MenuItemImage::create("medium.png", "medium_selected.png");
 	image2->setCallback([](Ref* ref) {
 		// my_action->changeScene(::createScene());
 	});
-	auto image3 = MenuItemImage::create("hard.png", "hard.png");
+	auto image3 = MenuItemImage::create("hard.png", "hard_selected.png");
 	image3->setCallback([](Ref* ref) {
 		// my_action->changeScene(::createScene());
 	});

@@ -4,6 +4,7 @@
 #include "MyAction.h"
 #include "HelpScene.h"
 #include "AboutScene.h"
+#include "SettingScene.h"
 
 #define my_action MyAction::getInstance()
 
@@ -32,14 +33,31 @@ bool Start::init()
 	*/
 
 	auto label = Label::createWithTTF("Catapult Game", "fonts/Marker Felt.ttf", 48);
-	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height));
+	label->setAnchorPoint(Vec2(0.5, 1));
+	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height / 2));
 	this->addChild(label, 1);
+
+	auto sprite = Sprite::create("shooter.png");
+	sprite->setScale(1.5f);
+	sprite->setPosition(visibleSize.width / 4, visibleSize.height / 2);
+	this->addChild(sprite, 1);
+
+	auto AIsprite = Sprite::create("AIshooter.png");
+	AIsprite->setScale(1.5f);
+	AIsprite->setPosition(visibleSize.width / 4 * 3, visibleSize.height / 2);
+	this->addChild(AIsprite, 1);
 
 	auto item = MenuItemLabel::create(Label::createWithTTF("Play", "fonts/Marker Felt.ttf", 80));
 	item->setCallback([](Ref* ref) {
 		my_action->changeScene(SelectScene::createScene());
 	});
 	item->setColor(Color3B::RED);
+
+	auto settingItem = MenuItemLabel::create(Label::createWithTTF("Setting", "fonts/Marker Felt.ttf", 40));
+	settingItem->setCallback([](Ref* ref) {
+		// ÉèÖÃÒ³Ãæ
+		my_action->changeScene(SettingScene::createScene());
+	});
 
 	auto helpItem = MenuItemLabel::create(Label::createWithTTF("Help", "fonts/Marker Felt.ttf", 40));
 	helpItem->setCallback([](Ref* ref) {
@@ -58,8 +76,8 @@ bool Start::init()
 		Director::getInstance()->end();
 	});
 
-	auto menu = Menu::create(item, helpItem, aboutItem, quitItem, NULL);
-	menu->setPosition(visibleSize.width / 2, visibleSize.height / 3);
+	auto menu = Menu::create(item, settingItem, helpItem, aboutItem, quitItem, NULL);
+	menu->setPosition(visibleSize.width / 2, visibleSize.height / 2.5);
 	menu->alignItemsVerticallyWithPadding(10);
 	this->addChild(menu, 1);
 
