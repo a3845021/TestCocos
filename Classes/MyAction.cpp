@@ -15,7 +15,7 @@ using namespace CocosDenshion; // SimpleAudioEngine ÃüÃû¿Õ¼ä
 #define ANIMATION_PER_FRAME_TIME 0.05f
 
 /*
-Ô¤¼ÓÔØ(¶¯»­£¬±³¾°ÒôÀÖ)
+Ô¤¼ÓÔØ(¶¯»­£¬±³¾°ÒôÀÖ£¬ÒôÐ§)
 */
 void MyAction::preLoad()
 {
@@ -23,6 +23,10 @@ void MyAction::preLoad()
 	audio->preloadBackgroundMusic("bgm/bgm_diewuyingge.mp3");
 	audio->preloadBackgroundMusic("bgm/bgm_huanqin.mp3");
 	audio->preloadBackgroundMusic("bgm/bgm_yuzhongmanbu.mp3");
+	
+	//Ô¤¼ÓÔØÒôÐ§
+	//audio->preloadEffect("filepath");
+
 	// play¶¯»­¼ÓÔØ
 	auto texture = Director::getInstance()->getTextureCache()->addImage("shooter_animation.png");
 	Vector<SpriteFrame*> animFrames(ANIMATION_FRAME);
@@ -55,6 +59,14 @@ void MyAction::preLoad()
 	}
 	auto tmpAIAnimation = Animation::createWithSpriteFrames(tmpAIFrames, ANIMATION_PER_FRAME_TIME);
 	AnimationCache::getInstance()->addAnimation(tmpAIAnimation, "AIAfterShoot");
+}
+
+/*
+²¥·ÅÒôÐ§
+*/
+void MyAction::playMusicEffect(char * file_path)
+{
+	SimpleAudioEngine::getInstance()->playEffect(file_path);
 }
 
 /*
@@ -278,6 +290,18 @@ void MyAction::judgeWin(int playerScore, int AIScore)
 {
 	if (playerScore > AIScore) database->setBoolForKey("isWin", true);
 	else database->setBoolForKey("isWin", false);
+}
+
+/*
+±¬Õ¨Ð§¹û
+*/
+void MyAction::showExplosion(cocos2d::Vec2 pos, cocos2d::Layer *layer, int localZOrder)
+{
+	auto pe = ParticleExplosion::createWithTotalParticles(100);
+	pe->setPosition(pos.x, pos.y);
+	pe->setLife(0.5f);
+	pe->setLifeVar(0.1f);
+	layer->addChild(pe, localZOrder);
 }
 
 /*

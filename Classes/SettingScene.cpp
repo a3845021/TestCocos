@@ -34,5 +34,13 @@ bool SettingScene::init()
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(label);
 
+	/*auto pe = ParticleExplosion::createWithTotalParticles(100);
+	pe->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	pe->setLife(0.3f);
+	pe->setLifeVar(0.1f);
+	//auto emitter = ParticleFireworks::create();
+
+	this->addChild(pe, 2);*/
+
 	return true;
 }

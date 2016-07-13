@@ -14,6 +14,7 @@ public:
 		return &instance;
 	}
 	void preLoad();
+	void playMusicEffect(char* file_path);
 	void changeScene(cocos2d::Scene* scene);
 	cocos2d::Node* createNode(int tag, cocos2d::PhysicsBody* physics_body = NULL, bool dynamic = true);
 	cocos2d::Sprite* createSprite(std::string file_name, int tag, Vec2 position, cocos2d::PhysicsBody* physics_body = NULL, bool dynamic = true);
@@ -32,6 +33,7 @@ public:
 	void arrowColor(cocos2d::Sprite* arrow, float touchTime);
 	void showDizzyPic(cocos2d::Sprite* sprite, float dizzy_time);
 	void judgeWin(int playerScore, int AIScore);
+	void showExplosion(cocos2d::Vec2 pos, cocos2d::Layer *layer, int localZOrder);
 	const char* getChinese(char* file_name, char* key_name);
 };
 

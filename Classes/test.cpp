@@ -329,7 +329,7 @@ void Test::contactEvent()
 		// 获取发生碰撞的两个物体A,B
 		auto A = (Sprite*)contact.getShapeA()->getBody()->getNode();
 		auto B = (Sprite*)contact.getShapeB()->getBody()->getNode();
-
+		
 		/*
 		Tag 0 地面 挡板
 		Tag 1 玩家炮弹
@@ -345,9 +345,11 @@ void Test::contactEvent()
 			(A->getTag() == 4 && B->getTag() == 0) || (A->getTag() == 0 && B->getTag() == 4))
 		{
 			if (A->getTag() == 0) {
+				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
 			}
 			else {
+				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
 			}
 			return true;
@@ -355,9 +357,15 @@ void Test::contactEvent()
 
 		// 两发炮弹碰撞 则都消失
 		// 包括两发来自同一边的炮弹
+		// 触发爆炸效果
 		if ((A->getTag() == 1 && B->getTag() == 4) || (A->getTag() == 4 && B->getTag() == 1) ||
 			(A->getTag() == 1 && B->getTag() == 1) || (A->getTag() == 4 && B->getTag() == 4))
 		{
+			Vec2 posA = A->getPosition();
+			Vec2 posB = B->getPosition();
+			Vec2 tmp = Vec2((posA.x + posB.x) / 2, (posA.y + posB.y) / 2);
+			my_action->showExplosion(tmp, this, 5); // 爆炸效果
+
 			my_action->spriteFadeOut(A);
 			my_action->spriteFadeOut(B);
 			return true;
@@ -368,9 +376,11 @@ void Test::contactEvent()
 			(A->getTag() == 1 && B->getTag() == 5) || (A->getTag() == 5 && B->getTag() == 1))
 		{
 			if (A->getTag() == 1) {
+				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
 			}
 			else {
+				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
 			}
 			return true;
@@ -386,6 +396,11 @@ void Test::contactEvent()
 				giftPosition = A->getPosition();
 			}
 			
+			Vec2 posA = A->getPosition();
+			Vec2 posB = B->getPosition();
+			Vec2 tmp = Vec2((posA.x + posB.x) / 2, (posA.y + posB.y) / 2);
+			my_action->showExplosion(tmp, this, 5); // 爆炸效果
+
 			my_action->spriteFadeOut(A);
 			my_action->spriteFadeOut(B);
 			my_action->showPerScore(giftPosition, GIFT_SCORE, this);
@@ -412,6 +427,11 @@ void Test::contactEvent()
 				}
 			}
 
+			Vec2 posA = A->getPosition();
+			Vec2 posB = B->getPosition();
+			Vec2 tmp = Vec2((posA.x + posB.x) / 2, (posA.y + posB.y) / 2);
+			my_action->showExplosion(tmp, this, 5); // 爆炸效果
+
 			my_action->spriteFadeOut(A);
 			my_action->spriteFadeOut(B);
 			my_action->showPerScore(giftPosition, GIFT_SCORE, this);
@@ -423,12 +443,15 @@ void Test::contactEvent()
 		// 玩家炮弹命中AI投石机 AI投石机眩晕
 		if ((A->getTag() == 1 && B->getTag() == 6) || (A->getTag() == 6 && B->getTag() == 1)) {
 			if (A->getTag() == 1) {
+				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
 			}
 			else {
+				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
 			}
 			// AI 停止攻击2s
+			if (tmpAIshootTime > AIshootTime - 1) tmpAIshootTime = AIshootTime - 1;
 			tmpAIshootTime -= DIZZY_TIME;
 			auto dizzy = my_action->createSprite("dizzy.png", 7, AIdizzyPosition);
 			my_action->addNode(this, dizzy, 5);
@@ -437,12 +460,14 @@ void Test::contactEvent()
 			return true;
 		}
 
-		// AI炮弹命中玩家投石机 玩家投石机眩晕（.未实现.）
+		// AI炮弹命中玩家投石机 玩家投石机眩晕
 		if ((A->getTag() == 3 && B->getTag() == 4) || (A->getTag() == 4 && B->getTag() == 3)) {
 			if (A->getTag() == 4) {
+				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
 			}
 			else {
+				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
 			}
 			/*
@@ -468,9 +493,11 @@ void Test::contactEvent()
 			(A->getTag() == 4 && B->getTag() == 6) || (A->getTag() == 6 && B->getTag() == 4))
 		{
 			if (A->getTag() == 4) {
+				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
 			}
 			else {
+				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
 			}
 			return true;

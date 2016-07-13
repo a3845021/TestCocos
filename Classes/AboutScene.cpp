@@ -34,11 +34,11 @@ bool AboutScene::init()
 	about->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(about, 2);
 
-	auto version = Label::createWithTTF("Version:1.0", "fonts/Marker Felt.ttf", 36);
+	auto version = Label::createWithTTF("Version:1.1", "fonts/Marker Felt.ttf", 36);
 	version->setPosition(visibleSize.width / 2, visibleSize.height / 3);
 	this->addChild(version, 2);
 
-	auto updateTime = Label::createWithTTF("Update Time:2016.07.12", "fonts/Marker Felt.ttf", 36);
+	auto updateTime = Label::createWithTTF("Update Time:2016.07.13", "fonts/Marker Felt.ttf", 36);
 	updateTime->setPosition(visibleSize.width / 2, visibleSize.height / 3 - version->getContentSize().height);
 	this->addChild(updateTime, 2);
 
