@@ -1,9 +1,13 @@
 #include "MyAction.h"
 #include "RandomNum.h"
+#include "SimpleAudioEngine.h"
+
+using namespace CocosDenshion; // SimpleAudioEngine 命名空间
 
 #define database UserDefault::getInstance() // 本地存储实例
 #define random_num RandomNum::getInstance()
 #define director Director::getInstance()
+#define audio SimpleAudioEngine::getInstance()
 #define PI 3.14159265 // 圆周率
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define MAX_UINT 0xFFFFFFFF
@@ -15,6 +19,10 @@
 */
 void MyAction::preLoad()
 {
+	// 预加载bgm
+	audio->preloadBackgroundMusic("bgm/bgm_diewuyingge.mp3");
+	audio->preloadBackgroundMusic("bgm/bgm_huanqin.mp3");
+	audio->preloadBackgroundMusic("bgm/bgm_yuzhongmanbu.mp3");
 	// play动画加载
 	auto texture = Director::getInstance()->getTextureCache()->addImage("shooter_animation.png");
 	Vector<SpriteFrame*> animFrames(ANIMATION_FRAME);

@@ -3,8 +3,11 @@
 #include "start.h"
 #include "RandomNum.h"
 #include "win.h"
+#include "SimpleAudioEngine.h"
 #include <vector>
 #include <cmath>
+
+using namespace CocosDenshion;
 
 #define director Director::getInstance() //导演类单例
 #define random_num RandomNum::getInstance() // 随机数单例
@@ -71,7 +74,10 @@ bool Test::init(PhysicsWorld* pw)
 	{
 		return false;
 	}
-	
+
+	// 播放bgm
+	//SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm/bgm_diewuyingge.mp3", true);
+
 	// 初始化gift位置列表
 	allGiftPos.clear();
 	AIAllGiftPos.clear();

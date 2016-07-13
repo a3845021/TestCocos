@@ -5,6 +5,9 @@
 #include "HelpScene.h"
 #include "AboutScene.h"
 #include "SettingScene.h"
+#include "SimpleAudioEngine.h"
+
+using namespace CocosDenshion;
 
 #define my_action MyAction::getInstance()
 
@@ -22,6 +25,12 @@ bool Start::init()
 	{
 		return false;
 	}
+
+	// ²¥·Åbgm
+	if (!SimpleAudioEngine::sharedEngine()->isBackgroundMusicPlaying()) {
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm/bgm_huanqin.mp3", true);
+	}
+
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	
 	/*
