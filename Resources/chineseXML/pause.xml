@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<plist version="1.0">
+  <dict>
+    <key>Pause</key>
+    <string>暂停游戏</string>
+    
+    <key>Continue</key>
+    <string>继续游戏</string>
+
+    <key>Restart</key>
+    <string>重玩本关</string>
+
+    <key>Reselect</key>
+    <string>重新选关</string>
+    
+    <key>BackToMenu</key>
+    <string>回主菜单</string>
+    
+  </dict>
+</plist>

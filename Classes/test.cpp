@@ -25,6 +25,7 @@ using namespace CocosDenshion;
 #define TARGET_SCORE 100 // 目标分数
 #define SCORE_FORMAT "Score:%d  AIScore:%d" // 分数字符串
 #define MARKER_FELT_TTF "fonts/Marker Felt.ttf" // 字体路径
+#define TEXT_FONT "fonts/shaonvxin.ttf"
 #define BALL_RADIUS 18.0f // 炮弹半径
 
 // 两个投石车、发射点、眩晕图标的位置
@@ -118,18 +119,6 @@ bool Test::init(PhysicsWorld* pw)
 	auto brick = my_action->createSprite("brick.png", 0, Vec2(visibleSize.width / 2, 90), PhysicsBody::createBox(Size(20, 100)), false);
 	my_action->addNode(this, brick, 1);
 
-	// Back按钮
-	auto item = MenuItemLabel::create(Label::createWithTTF("Back", MARKER_FELT_TTF, 36));
-	item->setCallback([&](Ref* ref) {
-		//my_action->changeScene(Start::createScene());
-		//director->pause();
-		doPause();
-	});
-	auto menu = Menu::create(item, NULL);
-	menu->setPosition(item->getContentSize().width, visibleSize.height - item->getContentSize().height);
-	menu->setColor(Color3B::BLACK);
-	this->addChild(menu, 5);
-
 	// 添加玩家投石机  设置锚点为Sprite的左下角
 	shooter = my_action->createSprite("shooter.png", 3, playerPosition, Vec2(0, 0), 
 		PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(20, -20)), false);
@@ -160,7 +149,7 @@ bool Test::init(PhysicsWorld* pw)
 	// 显示目标分数
 	char c[30];
 	sprintf(c, "Target:%d", TARGET_SCORE);
-	auto targetLabel = Label::createWithTTF(c, MARKER_FELT_TTF, 36);
+	auto targetLabel = Label::createWithTTF(c, TEXT_FONT, 36);
 	targetLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + targetLabel->getContentSize().height);
 	targetLabel->setColor(Color3B::RED);
 	this->addChild(targetLabel, 5);
@@ -172,17 +161,29 @@ bool Test::init(PhysicsWorld* pw)
 	this->addChild(testLabel, 5);*/
 
 	// 显示双方分数
-	scoreLabel = Label::createWithTTF(SCORE_FORMAT, MARKER_FELT_TTF, 36);
+	scoreLabel = Label::createWithTTF(SCORE_FORMAT, TEXT_FONT, 36);
 	scoreLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	scoreLabel->setColor(Color3B::BLACK);
 	my_action->updateLabelScore(scoreLabel, playScore, AIScore, SCORE_FORMAT);
 	this->addChild(scoreLabel, 5);
 
 	// 显示剩余时间
-	timeLabel = Label::createWithTTF("60.0", MARKER_FELT_TTF, 36);
+	timeLabel = Label::createWithTTF("60.0", TEXT_FONT, 36);
 	timeLabel->setPosition(visibleSize.width / 2, visibleSize.height - timeLabel->getContentSize().height);
 	timeLabel->setColor(Color3B::BLUE);
 	this->addChild(timeLabel, 5);
+
+	// Back按钮
+	auto item = MenuItemLabel::create(Label::createWithTTF("Pause", TEXT_FONT, 36));
+	item->setCallback([&](Ref* ref) {
+		//my_action->changeScene(Start::createScene());
+		//director->pause();
+		doPause();
+	});
+	auto menu = Menu::create(item, NULL);
+	menu->setPosition(visibleSize.width / 2, visibleSize.height - item->getContentSize().height * 2.5);
+	menu->setColor(Color3B::BLACK);
+	this->addChild(menu, 5);
 
 	// 触控事件
 	touchEvent();
