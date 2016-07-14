@@ -18,6 +18,7 @@ public:
 	Vec2 AIselectTarget();
 	void AIshoot();
 	void playShoot();
+	void doPause();
 
 	Vec2 touchLocation, AItarget;
 	bool isTouch, isHit;

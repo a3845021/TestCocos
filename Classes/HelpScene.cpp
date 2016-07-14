@@ -27,7 +27,7 @@ bool HelpScene::init()
 	cocos2dx好像不支持中文的label。
 	*/
 
-	auto back = MenuItemLabel::create(Label::createWithTTF("Back", "fonts/Marker Felt.ttf", 36));
+	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
 	});
@@ -50,14 +50,14 @@ bool HelpScene::init()
 	help2->setVisible(false);
 	this->addChild(help2, 2);
 
-	front = MenuItemLabel::create(Label::createWithTTF("Front", "fonts/Marker Felt.ttf", 28));
+	front = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/HelpScene.xml", "Front"), "fonts/shaonvxin.ttf", 28));
 	front->setCallback([&](Ref* ref) {
 		front->setVisible(false);
 		help2->setVisible(false);
 		next->setVisible(true);
 		help1->setVisible(true);
 	});
-	next = MenuItemLabel::create(Label::createWithTTF("Next", "fonts/Marker Felt.ttf", 28));
+	next = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/HelpScene.xml", "Next"), "fonts/shaonvxin.ttf", 28));
 	next->setCallback([&](Ref* ref) {
 		front->setVisible(true);
 		help2->setVisible(true);

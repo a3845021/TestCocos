@@ -21,7 +21,7 @@ bool SettingScene::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
-	auto back = MenuItemLabel::create(Label::createWithTTF("Back", "fonts/Marker Felt.ttf", 36));
+	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
 	});
@@ -30,7 +30,12 @@ bool SettingScene::init()
 	backMenu->setPosition(back->getContentSize().width, visibleSize.height - back->getContentSize().height);
 	this->addChild(backMenu, 5);
 
-	auto label = Label::createWithTTF("Setting Scene", "fonts/Marker Felt.ttf", 60);
+	/*auto label = Label::createWithTTF("Setting Scene", "fonts/Marker Felt.ttf", 60);
+	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(label);*/
+
+	auto text = my_action->getChinese("chineseXML/HelpScene.xml", "HelpTitle");
+	auto label = Label::create(text, "fonts/shaonvxin.ttf", 60);
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(label);
 

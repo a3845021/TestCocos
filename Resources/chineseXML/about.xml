@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<plist version="1.0">
+  <dict>
+    <key>Version</key>
+    <string>版本号:1.1</string>
+
+    <key>Update</key>
+    <string>更新时间:2016.07.13</string>
+
+    <key>Copyright</key>
+    <string>Copyright © 2016 16-CatapultGame-112 SunYat-Sen University</string>
+    
+  </dict>
+</plist>

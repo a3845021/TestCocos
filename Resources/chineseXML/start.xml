@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<plist version="1.0">
+  <dict>
+    <key>Play</key>
+    <string>开始游戏</string>
+
+    <key>Setting</key>
+    <string>设置</string>
+
+    <key>Help</key>
+    <string>帮助</string>
+
+    <key>About</key>
+    <string>关于</string>
+
+    <key>Quit</key>
+    <string>退出</string>
+
+    <key>Back</key>
+    <string>返回</string>
+  </dict>
+</plist>

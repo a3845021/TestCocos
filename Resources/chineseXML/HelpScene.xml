@@ -4,5 +4,11 @@
   <dict>
     <key>HelpTitle</key>
     <string>游戏玩法</string>
+
+    <key>Next</key>
+    <string>下一页</string>
+
+    <key>Front</key>
+    <string>上一页</string>
   </dict>
 </plist>

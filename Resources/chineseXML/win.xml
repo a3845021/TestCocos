@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<plist version="1.0">
+  <dict>
+    <key>Win</key>
+    <string>恭喜你赢了!!</string>
+
+    <key>Lose</key>
+    <string>很遗憾你输了...</string>
+
+    <key>Restart</key>
+    <string>重新开始</string>
+
+    <key>Select</key>
+    <string>返回选择关卡</string>
+
+    <key>Main</key>
+    <string>返回主菜单</string>
+  </dict>
+</plist>

@@ -21,7 +21,7 @@ bool AboutScene::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
-	auto back = MenuItemLabel::create(Label::createWithTTF("Back", "fonts/Marker Felt.ttf", 36));
+	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
 	});
@@ -34,28 +34,17 @@ bool AboutScene::init()
 	about->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(about, 2);
 
-	auto version = Label::createWithTTF("Version:1.1", "fonts/Marker Felt.ttf", 36);
+	auto version = Label::createWithTTF(my_action->getChinese("chineseXML/about.xml", "Version"), "fonts/shaonvxin.ttf", 36);
 	version->setPosition(visibleSize.width / 2, visibleSize.height / 3);
 	this->addChild(version, 2);
 
-	auto updateTime = Label::createWithTTF("Update Time:2016.07.13", "fonts/Marker Felt.ttf", 36);
+	auto updateTime = Label::createWithTTF(my_action->getChinese("chineseXML/about.xml", "Update"), "fonts/shaonvxin.ttf", 36);
 	updateTime->setPosition(visibleSize.width / 2, visibleSize.height / 3 - version->getContentSize().height);
 	this->addChild(updateTime, 2);
 
-	/*auto label = Label::createWithTTF("About Scene", "fonts/Marker Felt.ttf", 60);
-	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	this->addChild(label);*/
-
-	/*auto shooter = Sprite::create("shooter.png");
-	Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));
-	shooter->runAction(RepeatForever::create(shooterAnimate));
-	shooter->setAnchorPoint(Vec2(0, 0));
-	shooter->setPosition(Vec2(100, 35));
-	this->addChild(shooter, 2);
-
-	auto ball = Sprite::create("bullet.png");
-	ball->setPosition(Vec2(150, 150));
-	this->addChild(ball, 2);*/
+	/*auto copyright = Label::createWithTTF(my_action->getChinese("chineseXML/about.xml", "Copyright"), "fonts/shaonvxin.ttf", 18);
+	copyright->setPosition(visibleSize.width / 2, copyright->getContentSize().height);
+	this->addChild(copyright, 2);*/
 
 	return true;
 }

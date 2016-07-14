@@ -4,6 +4,7 @@
 #include "RandomNum.h"
 #include "win.h"
 #include "SimpleAudioEngine.h"
+#include "GamePause.h"
 #include <vector>
 #include <cmath>
 
@@ -119,8 +120,10 @@ bool Test::init(PhysicsWorld* pw)
 
 	// Back按钮
 	auto item = MenuItemLabel::create(Label::createWithTTF("Back", MARKER_FELT_TTF, 36));
-	item->setCallback([](Ref* ref) {
-		my_action->changeScene(Start::createScene());
+	item->setCallback([&](Ref* ref) {
+		//my_action->changeScene(Start::createScene());
+		//director->pause();
+		doPause();
 	});
 	auto menu = Menu::create(item, NULL);
 	menu->setPosition(item->getContentSize().width, visibleSize.height - item->getContentSize().height);
@@ -541,4 +544,22 @@ void Test::playShoot()
 	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, 360)));
 	Vec2 v = my_action->calPlayerShootVelocity(shootPosition, touchLocation, INIT_SPEED, this->getTouchTime());
 	my_action->shootAction(this, v, new_ball, 1);
+}
+
+/*
+暂停游戏
+*/
+void Test::doPause()
+{
+	//创建RenderTexture，纹理画布大小为窗口大小(800, 480)
+	auto renderTexture = RenderTexture::create(800, 480);
+
+	//遍历test类的所有子节点信息，画入renderTexture中。
+	//这里类似截图。
+	renderTexture->begin();
+	this->getParent()->visit();
+	renderTexture->end();
+
+	//将游戏界面暂停，压入场景堆栈。并切换到GamePause界面
+	director->pushScene(GamePause::createScene(renderTexture));
 }

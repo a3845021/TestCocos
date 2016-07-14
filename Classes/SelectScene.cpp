@@ -25,6 +25,9 @@ bool SelectScene::init()
 	/*
 	Ìí¼Ó±³¾°Í¼¡£
 	*/
+	auto bg = Sprite::create("select.png");
+	bg->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(bg, 1);
 
 	auto image1 = MenuItemImage::create("simple.png", "simple_selected.png");
 	image1->setCallback([](Ref* ref) {
@@ -44,7 +47,7 @@ bool SelectScene::init()
 	menu->alignItemsHorizontallyWithPadding(30);
 	this->addChild(menu, 1);
 
-	auto back = MenuItemLabel::create(Label::createWithTTF("Back", "fonts/Marker Felt.ttf", 36));
+	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());
 	});
