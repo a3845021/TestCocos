@@ -20,12 +20,13 @@ using namespace CocosDenshion; // SimpleAudioEngine 命名空间
 void MyAction::preLoad()
 {
 	// 预加载bgm
-	audio->preloadBackgroundMusic("bgm/bgm_diewuyingge.mp3");
+	//audio->preloadBackgroundMusic("bgm/bgm_diewuyingge.mp3");
 	audio->preloadBackgroundMusic("bgm/bgm_huanqin.mp3");
-	audio->preloadBackgroundMusic("bgm/bgm_yuzhongmanbu.mp3");
+	//audio->preloadBackgroundMusic("bgm/bgm_yuzhongmanbu.mp3");
 	
 	//预加载音效
-	//audio->preloadEffect("filepath");
+	audio->preloadEffect("bgm/explosion.wav");
+	audio->preloadEffect("bgm/GetPoint.wav");
 
 	// play动画加载
 	auto texture = Director::getInstance()->getTextureCache()->addImage("shooter_animation.png");
@@ -302,6 +303,22 @@ void MyAction::showExplosion(cocos2d::Vec2 pos, cocos2d::Layer *layer, int local
 	pe->setLife(0.5f);
 	pe->setLifeVar(0.1f);
 	layer->addChild(pe, localZOrder);
+}
+
+/*
+播放爆炸音效
+*/
+void MyAction::playExplosionEffect()
+{
+	audio->playEffect("bgm/explosion.wav");
+}
+
+/*
+播放得分音效
+*/
+void MyAction::playGetPointEffect()
+{
+	audio->playEffect("bgm/GetPoint.wav");
 }
 
 /*

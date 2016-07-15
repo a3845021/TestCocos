@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<plist version="1.0">
+  <dict>
+    <key>BGM</key>
+    <string>播放音乐</string>
+
+    <key>Effect</key>
+    <string>播放音效</string>
+
+  </dict>
+</plist>

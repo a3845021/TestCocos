@@ -348,6 +348,7 @@ void Test::contactEvent()
 		if ((A->getTag() == 1 && B->getTag() == 0) || (A->getTag() == 0 && B->getTag() == 1) ||
 			(A->getTag() == 4 && B->getTag() == 0) || (A->getTag() == 0 && B->getTag() == 4))
 		{
+			my_action->playExplosionEffect(); // 爆炸音效
 			if (A->getTag() == 0) {
 				my_action->showExplosion(B->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(B);
@@ -365,6 +366,7 @@ void Test::contactEvent()
 		if ((A->getTag() == 1 && B->getTag() == 4) || (A->getTag() == 4 && B->getTag() == 1) ||
 			(A->getTag() == 1 && B->getTag() == 1) || (A->getTag() == 4 && B->getTag() == 4))
 		{
+			my_action->playExplosionEffect(); // 爆炸音效
 			Vec2 posA = A->getPosition();
 			Vec2 posB = B->getPosition();
 			Vec2 tmp = Vec2((posA.x + posB.x) / 2, (posA.y + posB.y) / 2);
@@ -379,6 +381,7 @@ void Test::contactEvent()
 		if ((A->getTag() == 1 && B->getTag() == 3) || (A->getTag() == 3 && B->getTag() == 1) ||
 			(A->getTag() == 1 && B->getTag() == 5) || (A->getTag() == 5 && B->getTag() == 1))
 		{
+			my_action->playExplosionEffect(); // 爆炸音效
 			if (A->getTag() == 1) {
 				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
@@ -392,6 +395,7 @@ void Test::contactEvent()
 
 		// 玩家炮弹碰到玩家目标 炮弹和目标均消失 增加分数
 		if ((A->getTag() == 1 && B->getTag() == 2) || (A->getTag() == 2 && B->getTag() == 1)) {
+			my_action->playGetPointEffect(); // 得分音效
 			Vec2 giftPosition;
 			if (A->getTag() == 1) {
 				giftPosition = B->getPosition();
@@ -415,6 +419,7 @@ void Test::contactEvent()
 
 		// AI炮弹碰到AI目标 炮弹和目标都消失 AI分数增加
 		if ((A->getTag() == 4 && B->getTag() == 5) || (A->getTag() == 5 && B->getTag() == 4)) {
+			my_action->playGetPointEffect(); // 得分音效
 			Vec2 giftPosition;
 			if (A->getTag() == 4) {
 				giftPosition = B->getPosition();
@@ -446,6 +451,7 @@ void Test::contactEvent()
 
 		// 玩家炮弹命中AI投石机 AI投石机眩晕
 		if ((A->getTag() == 1 && B->getTag() == 6) || (A->getTag() == 6 && B->getTag() == 1)) {
+			my_action->playExplosionEffect(); // 爆炸音效
 			if (A->getTag() == 1) {
 				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
@@ -466,6 +472,7 @@ void Test::contactEvent()
 
 		// AI炮弹命中玩家投石机 玩家投石机眩晕
 		if ((A->getTag() == 3 && B->getTag() == 4) || (A->getTag() == 4 && B->getTag() == 3)) {
+			my_action->playExplosionEffect(); // 爆炸音效
 			if (A->getTag() == 4) {
 				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);
@@ -496,6 +503,7 @@ void Test::contactEvent()
 		if ((A->getTag() == 4 && B->getTag() == 2) || (A->getTag() == 2 && B->getTag() == 4) ||
 			(A->getTag() == 4 && B->getTag() == 6) || (A->getTag() == 6 && B->getTag() == 4))
 		{
+			my_action->playExplosionEffect(); // 爆炸音效
 			if (A->getTag() == 4) {
 				my_action->showExplosion(A->getPosition(), this, 5); // 爆炸效果
 				my_action->spriteFadeOut(A);

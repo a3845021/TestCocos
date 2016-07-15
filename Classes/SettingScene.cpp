@@ -34,8 +34,8 @@ bool SettingScene::init()
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(label);*/
 
-	auto text = my_action->getChinese("chineseXML/HelpScene.xml", "HelpTitle");
-	auto label = Label::create(text, "fonts/shaonvxin.ttf", 60);
+	//auto text = my_action->getChinese("chineseXML/setting.xml", "BGM");
+	auto label = Label::create(my_action->getChinese("chineseXML/setting.xml", "BGM"), "fonts/shaonvxin.ttf", 60);
 	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(label);
 
