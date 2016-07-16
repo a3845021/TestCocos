@@ -2,9 +2,14 @@
 #include "HelloWorldScene.h"
 #include "start.h"
 #include "MyAction.h"
+#include "SimpleAudioEngine.h"
+#include "res.h"
+
+using namespace CocosDenshion;
 
 #define ANIMATION_FRAME 6
 #define ANIMATION_PER_FRAME_TIME 0.05f
+#define database UserDefault::getInstance() // 本地存储实例
 
 USING_NS_CC;
 
@@ -111,6 +116,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	预加载动画
 	*/
 	MyAction::getInstance()->preLoad();
+
+	// 开始游戏默认打开音乐
+	playBGM_extern = true;
+	playEffect_extern = true;
+	// 播放背景音乐
+	SimpleAudioEngine::getInstance()->playBackgroundMusic("bgm/bgm_huanqin.mp3", true);
 
 	/*
 	加载开始页面

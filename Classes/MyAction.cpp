@@ -1,6 +1,7 @@
 #include "MyAction.h"
 #include "RandomNum.h"
 #include "SimpleAudioEngine.h"
+#include "res.h"
 
 using namespace CocosDenshion; // SimpleAudioEngine ÃüÃû¿Õ¼ä
 
@@ -67,7 +68,9 @@ void MyAction::preLoad()
 */
 void MyAction::playMusicEffect(char * file_path)
 {
-	SimpleAudioEngine::getInstance()->playEffect(file_path);
+	if (playEffect_extern) {
+		SimpleAudioEngine::getInstance()->playEffect(file_path);
+	}
 }
 
 /*
@@ -310,7 +313,9 @@ void MyAction::showExplosion(cocos2d::Vec2 pos, cocos2d::Layer *layer, int local
 */
 void MyAction::playExplosionEffect()
 {
-	audio->playEffect("bgm/explosion.wav");
+	if (playEffect_extern) {
+		audio->playEffect("bgm/explosion.wav");
+	}
 }
 
 /*
@@ -318,7 +323,9 @@ void MyAction::playExplosionEffect()
 */
 void MyAction::playGetPointEffect()
 {
-	audio->playEffect("bgm/GetPoint.wav");
+	if (playEffect_extern) {
+		audio->playEffect("bgm/GetPoint.wav");
+	}
 }
 
 /*

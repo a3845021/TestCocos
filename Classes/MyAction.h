@@ -8,6 +8,7 @@ USING_NS_CC;
 class MyAction {
 private:
 	MyAction() {}
+
 public:
 	static MyAction* getInstance() {
 		static MyAction instance;

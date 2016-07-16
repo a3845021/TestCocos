@@ -9,4 +9,5 @@ public:
 	static cocos2d::Scene* createScene();
 	virtual bool init();
 	CREATE_FUNC(SettingScene);
+	MenuItemImage *playBGM, *playEffect, *notPlayBGM, *notPlayEffect;
 };

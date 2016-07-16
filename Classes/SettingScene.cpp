@@ -1,8 +1,14 @@
 #include "SettingScene.h"
 #include "start.h"
 #include "MyAction.h"
+#include "SimpleAudioEngine.h"
+#include "res.h"
 
+using namespace CocosDenshion;
+
+#define audio SimpleAudioEngine::getInstance()
 #define my_action MyAction::getInstance()
+#define database UserDefault::getInstance() // ±¾µØ´æ´¢ÊµÀı
 
 cocos2d::Scene * SettingScene::createScene()
 {
@@ -30,22 +36,68 @@ bool SettingScene::init()
 	backMenu->setPosition(back->getContentSize().width, visibleSize.height - back->getContentSize().height);
 	this->addChild(backMenu, 5);
 
-	/*auto label = Label::createWithTTF("Setting Scene", "fonts/Marker Felt.ttf", 60);
-	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	this->addChild(label);*/
+	auto bg = Sprite::create("setting.png");
+	bg->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(bg, 0);
 
-	//auto text = my_action->getChinese("chineseXML/setting.xml", "BGM");
-	auto label = Label::create(my_action->getChinese("chineseXML/setting.xml", "BGM"), "fonts/shaonvxin.ttf", 60);
-	label->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	this->addChild(label);
+	playBGM = MenuItemImage::create("BGMplay.png", "BGMplay.png");
+	playBGM->setCallback([&](Ref* ref) {
+		playBGM->setVisible(false);
+		notPlayBGM->setVisible(true);
+		playBGM_extern = false;
+		audio->pauseBackgroundMusic();
+	});
 
-	/*auto pe = ParticleExplosion::createWithTotalParticles(100);
-	pe->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	pe->setLife(0.3f);
-	pe->setLifeVar(0.1f);
-	//auto emitter = ParticleFireworks::create();
+	playEffect = MenuItemImage::create("EffectPlay.png", "EffectPlay.png");
+	playEffect->setCallback([&](Ref* ref) {
+		playEffect->setVisible(false);
+		notPlayEffect->setVisible(true);
+		playEffect_extern = false;
+	});
 
-	this->addChild(pe, 2);*/
+	auto menu1 = Menu::create(playBGM, playEffect, NULL);
+	menu1->alignItemsHorizontallyWithPadding(30);
+	menu1->setPosition(visibleSize.width / 2, visibleSize.height / 4);
+
+	notPlayBGM = MenuItemImage::create("BGMnotplay.png", "BGMnotplay.png");
+	notPlayBGM->setCallback([&](Ref* ref) {
+		playBGM->setVisible(true);
+		notPlayBGM->setVisible(false);
+		playBGM_extern = true;
+		audio->resumeBackgroundMusic();
+	});
+
+	notPlayEffect = MenuItemImage::create("EffectNotPlay.png", "EffectNotPlay.png");
+	notPlayEffect->setCallback([&](Ref* ref) {
+		playEffect->setVisible(true);
+		notPlayEffect->setVisible(false);
+		playEffect_extern = true;
+	});
+
+	auto menu2 = Menu::create(notPlayBGM, notPlayEffect, NULL);
+	menu2->alignItemsHorizontallyWithPadding(30);
+	menu2->setPosition(visibleSize.width / 2, visibleSize.height / 4);
+	
+	if (playBGM_extern) {
+		playBGM->setVisible(true);
+		notPlayBGM->setVisible(false);
+	}
+	else {
+		playBGM->setVisible(false);
+		notPlayBGM->setVisible(true);
+	}
+
+	if (playEffect_extern) {
+		playEffect->setVisible(true);
+		notPlayEffect->setVisible(false);
+	}
+	else {
+		playEffect->setVisible(false);
+		notPlayEffect->setVisible(true);
+	}
+
+	this->addChild(menu1, 1);
+	this->addChild(menu2, 1);
 
 	return true;
 }
