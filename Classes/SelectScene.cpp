@@ -25,6 +25,10 @@ bool SelectScene::init()
 	/*
 	Ìí¼Ó±³¾°Í¼¡£
 	*/
+	auto background = Sprite::create("other_bg.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(background, 0);
+
 	auto bg = Sprite::create("select.png");
 	bg->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(bg, 1);
@@ -43,6 +47,7 @@ bool SelectScene::init()
 	});
 
 	auto menu = Menu::create(image1, image2, image3, NULL);
+	menu->setOpacity(200);
 	menu->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	menu->alignItemsHorizontallyWithPadding(30);
 	this->addChild(menu, 1);

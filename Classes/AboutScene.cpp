@@ -21,6 +21,10 @@ bool AboutScene::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
+	auto background = Sprite::create("start_bg.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(background, 0);
+
 	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {
 		my_action->changeScene(Start::createScene());

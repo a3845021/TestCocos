@@ -36,6 +36,10 @@ bool SettingScene::init()
 	backMenu->setPosition(back->getContentSize().width, visibleSize.height - back->getContentSize().height);
 	this->addChild(backMenu, 5);
 
+	auto background = Sprite::create("start_bg.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(background, 0);
+
 	auto bg = Sprite::create("setting.png");
 	bg->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(bg, 0);

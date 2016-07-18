@@ -35,18 +35,20 @@ bool Start::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	
-	/*
-	Ìí¼Ó±³¾°Í¼
-	auto background = Sprite::create("bg.jpg");
+	
+	// Ìí¼Ó±³¾°Í¼
+	auto background = Sprite::create("start_bg.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(background, 0);
-	//background->setVisible(false);
-	*/
+	
+	auto title = Sprite::create("title.png");
+	title->setPosition(visibleSize.width / 2, visibleSize.height - title->getContentSize().height);
+	this->addChild(title, 0);
 
-	auto label = Label::createWithTTF("Catapult Game", TEXT_FONT, 48);
+	/*auto label = Label::createWithTTF("Catapult Game", TEXT_FONT, 48);
 	label->setAnchorPoint(Vec2(0.5, 1));
 	label->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - label->getContentSize().height / 2));
-	this->addChild(label, 1);
+	this->addChild(label, 1);*/
 
 	auto sprite = Sprite::create("shooter.png");
 	sprite->setScale(1.5f);

@@ -3,10 +3,17 @@
 #include "test.h"
 #include "SelectScene.h"
 #include "start.h"
+#include "SimpleAudioEngine.h"
+#include "res.h"
 
+using namespace CocosDenshion;
+
+#define audio SimpleAudioEngine::getInstance()
 #define director Director::getInstance()
 #define my_action MyAction::getInstance()
 #define TEXT_FONT "fonts/shaonvxin.ttf"
+
+MenuItemImage *playBGM, *playEffect, *notPlayBGM, *notPlayEffect;
 
 cocos2d::Scene * GamePause::createScene()
 {
@@ -24,6 +31,7 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 
 	auto visibleSize = director->getVisibleSize();
 
+	// 保留原画面变灰
 	auto sprite = Sprite::createWithTexture(sqr->getSprite()->getTexture());
 	sprite->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	sprite->setFlipY(true);
@@ -35,10 +43,10 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 	scene->addChild(bg, 1);
 
 	auto pause = Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Pause"), TEXT_FONT, 40);
-	pause->setPosition(visibleSize.width / 2, visibleSize.height / 2 + pause->getContentSize().height * 1.5);
+	pause->setPosition(visibleSize.width / 2, visibleSize.height / 2 + pause->getContentSize().height * 2.5);
 	scene->addChild(pause, 1);
 
-	auto continue_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Continue"), TEXT_FONT, 28));
+	auto continue_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Continue"), TEXT_FONT, 36));
 	continue_game->setCallback([](Ref* ref) {
 		// 继续游戏
 		director->popScene();
@@ -51,10 +59,13 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 		my_action->changeScene(SelectScene::createScene());
 	});
 
-	auto restart_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Restart"), TEXT_FONT, 28));
-	restart_game->setCallback([](Ref* ref) {
+	auto restart_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Restart"), TEXT_FONT, 36));
+	restart_game->setCallback([&](Ref* ref) {
 		// 重新开始游戏
-		my_action->changeScene(Test::createScene());
+		if (game_level == 1) {
+			// 确定目前在玩的关卡号
+			my_action->changeScene(Test::createScene());
+		}
 	});
 	restart_game->setColor(Color3B::RED);
 
@@ -65,14 +76,74 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 	});
 
 	auto menu = Menu::create(continue_game, select, NULL);
-	menu->setPosition(visibleSize.width * 0.4, visibleSize.height / 2 - 40);
+	menu->setPosition(visibleSize.width * 0.4, visibleSize.height / 2 - 80);
 	menu->alignItemsVerticallyWithPadding(20);
 	scene->addChild(menu, 1);
 
 	auto menu2 = Menu::create(restart_game, backmenu, NULL);
-	menu2->setPosition(visibleSize.width * 0.6, visibleSize.height / 2 - 40);
+	menu2->setPosition(visibleSize.width * 0.6, visibleSize.height / 2 - 80);
 	menu2->alignItemsVerticallyWithPadding(20);
 	scene->addChild(menu2, 1);
+
+	// 打开关闭背景音乐或音效
+	playBGM = MenuItemImage::create("BGMplay.png", "BGMplay.png");
+	playBGM->setCallback([&](Ref* ref) {
+		playBGM->setVisible(false);
+		notPlayBGM->setVisible(true);
+		playBGM_extern = false;
+		audio->pauseBackgroundMusic();
+	});
+
+	playEffect = MenuItemImage::create("EffectPlay.png", "EffectPlay.png");
+	playEffect->setCallback([&](Ref* ref) {
+		playEffect->setVisible(false);
+		notPlayEffect->setVisible(true);
+		playEffect_extern = false;
+	});
+
+	auto menu11 = Menu::create(playBGM, playEffect, NULL);
+	menu11->alignItemsHorizontallyWithPadding(30);
+	menu11->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+
+	notPlayBGM = MenuItemImage::create("BGMnotplay.png", "BGMnotplay.png");
+	notPlayBGM->setCallback([&](Ref* ref) {
+		playBGM->setVisible(true);
+		notPlayBGM->setVisible(false);
+		playBGM_extern = true;
+		audio->resumeBackgroundMusic();
+	});
+
+	notPlayEffect = MenuItemImage::create("EffectNotPlay.png", "EffectNotPlay.png");
+	notPlayEffect->setCallback([&](Ref* ref) {
+		playEffect->setVisible(true);
+		notPlayEffect->setVisible(false);
+		playEffect_extern = true;
+	});
+
+	auto menu22 = Menu::create(notPlayBGM, notPlayEffect, NULL);
+	menu22->alignItemsHorizontallyWithPadding(30);
+	menu22->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+
+	if (playBGM_extern) {
+		playBGM->setVisible(true);
+		notPlayBGM->setVisible(false);
+	}
+	else {
+		playBGM->setVisible(false);
+		notPlayBGM->setVisible(true);
+	}
+
+	if (playEffect_extern) {
+		playEffect->setVisible(true);
+		notPlayEffect->setVisible(false);
+	}
+	else {
+		playEffect->setVisible(false);
+		notPlayEffect->setVisible(true);
+	}
+
+	scene->addChild(menu11, 1);
+    scene->addChild(menu22, 1);
 
 	return scene;
 }

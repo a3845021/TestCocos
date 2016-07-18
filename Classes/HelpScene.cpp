@@ -23,9 +23,10 @@ bool HelpScene::init()
 
 	/*
 	增加背景图
-	帮助界面的文字
-	cocos2dx好像不支持中文的label。
 	*/
+	auto background = Sprite::create("start_bg.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(background, 0);
 
 	auto back = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/start.xml", "Back"), "fonts/shaonvxin.ttf", 36));
 	back->setCallback([](Ref* ref) {

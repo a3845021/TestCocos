@@ -5,6 +5,7 @@
 #include "win.h"
 #include "SimpleAudioEngine.h"
 #include "GamePause.h"
+#include "res.h"
 #include <vector>
 #include <cmath>
 
@@ -77,8 +78,8 @@ bool Test::init(PhysicsWorld* pw)
 		return false;
 	}
 
-	// 播放bgm
-	//SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm/bgm_diewuyingge.mp3", true);
+	// 记录所在玩关卡号
+	game_level = 1;
 
 	// 初始化gift位置列表
 	allGiftPos.clear();
@@ -173,11 +174,9 @@ bool Test::init(PhysicsWorld* pw)
 	timeLabel->setColor(Color3B::BLUE);
 	this->addChild(timeLabel, 5);
 
-	// Back按钮
+	// Pause按钮
 	auto item = MenuItemLabel::create(Label::createWithTTF("Pause", TEXT_FONT, 36));
 	item->setCallback([&](Ref* ref) {
-		//my_action->changeScene(Start::createScene());
-		//director->pause();
 		doPause();
 	});
 	auto menu = Menu::create(item, NULL);

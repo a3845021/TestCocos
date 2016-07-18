@@ -39,6 +39,9 @@ bool Win::init()
 	/*
 	Ìí¼Ó±³¾°Í¼
 	*/
+	auto background = Sprite::create("start_bg.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	this->addChild(background, 0);
 
 	auto label = Label::createWithTTF(my_action->getChinese("chineseXML/win.xml", "Win"), TEXT_FONT, 80);
 	if (!isWin) label->setString(my_action->getChinese("chineseXML/win.xml", "Lose"));
