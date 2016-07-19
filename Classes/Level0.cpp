@@ -1,31 +1,24 @@
-#include "test.h"
+#include "Level0.h"
 #include "MyAction.h"
-#include "start.h"
 #include "RandomNum.h"
-#include "win.h"
-#include "SimpleAudioEngine.h"
 #include "GamePause.h"
+#include "win.h"
 #include "res.h"
-#include <vector>
-#include <cmath>
 
-using namespace CocosDenshion;
-
-#define director Director::getInstance() //导演类单例
-#define random_num RandomNum::getInstance() // 随机数单例
-#define my_action MyAction::getInstance() // MyAction存放可重用代码
+#define director Director::getInstance()
+#define my_action MyAction::getInstance()
+#define random_num RandomNum::getInstance()
 
 #define GAME_TIME 60.0f
 #define INIT_SPEED 250 // 实际速度为初始速度*点击时间
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
-#define AI_DEVIATION 0.2f //AI射击误差范围
-#define AI_SHOOT_PLAYER_PROBABILITY 0.2f // AI射击玩家概率
-#define GIFT_SCORE 25 // 每个目标的分数
+#define AI_DEVIATION 0.5f //AI射击误差范围
+#define AI_SHOOT_PLAYER_PROBABILITY 0.1f // AI射击玩家概率
+#define GIFT_SCORE 50 // 每个目标的分数
 #define G -200.0f // 重力加速度
 #define TARGET_SCORE 100 // 目标分数
 #define SCORE_FORMAT "Score:%d  AIScore:%d" // 分数字符串
-#define MARKER_FELT_TTF "fonts/Marker Felt.ttf" // 字体路径
 #define TEXT_FONT "fonts/shaonvxin.ttf"
 #define BALL_RADIUS 18.0f // 炮弹半径
 
@@ -39,28 +32,23 @@ const Vec2 AIdizzyPosition = Vec2(640, 150);
 
 const int ground_height = 40; // 地面高度
 
-float AIshootTime = 4.0f; // AI射击间隔
+float AIshootTime_level0 = 4.0f; // AI射击间隔
 
-float tmpAIshootTime, playerDizzyTime;
-std::vector<Vec2> allGiftPos, AIAllGiftPos;
-cocos2d::Vector<Sprite*> allPlayerBullet, allAIBullet;
+float tempAIshootTime, tempPlayerDizzyTime;
+std::vector<Vec2> allGiftPosition, AIAllGiftPosition;
 
-/*
-创建带物理引擎的场景
-设置重力加速度大小方向
-*/
-cocos2d::Scene * Test::createScene()
+cocos2d::Scene * Level0::createScene()
 {
 	auto scene = Scene::createWithPhysics();
 	scene->getPhysicsWorld()->setGravity(Vec2(0, G));
-	auto layer = Test::create(scene->getPhysicsWorld());
+	auto layer = Level0::create(scene->getPhysicsWorld());
 	scene->addChild(layer);
 	return scene;
 }
 
-Test* Test::create(PhysicsWorld* pw)
+Level0 * Level0::create(PhysicsWorld * pw)
 {
-	Test* pRet = new Test();
+	Level0* pRet = new Level0();
 	if (pRet && pRet->init(pw)) {
 		return pRet;
 	}
@@ -68,65 +56,63 @@ Test* Test::create(PhysicsWorld* pw)
 	return NULL;
 }
 
-/*
-初始化场景
-*/
-bool Test::init(PhysicsWorld* pw)
+bool Level0::init(PhysicsWorld * pw)
 {
+
 	if (!Layer::init())
 	{
 		return false;
 	}
 
 	// 记录所在玩关卡号
-	game_level = 1;
+	game_level = 0;
 
 	// 初始化gift位置列表
-	allGiftPos.clear();
-	AIAllGiftPos.clear();
+	allGiftPosition.clear();
+	AIAllGiftPosition.clear();
 
-	allGiftPos.push_back(Vec2(750, 250));
-	allGiftPos.push_back(Vec2(750, 350));
-	allGiftPos.push_back(Vec2(750, 450));
-	allGiftPos.push_back(Vec2(600, 450));
+	allGiftPosition.push_back(Vec2(750, 300));
+	//allGiftPosition.push_back(Vec2(750, 350));
+	allGiftPosition.push_back(Vec2(750, 450));
+	//allGiftPosition.push_back(Vec2(600, 450));
 
-	AIAllGiftPos.push_back(Vec2(50, 250));
-	AIAllGiftPos.push_back(Vec2(50, 350));
-	AIAllGiftPos.push_back(Vec2(50, 450));
-	AIAllGiftPos.push_back(Vec2(200, 450));
+	AIAllGiftPosition.push_back(Vec2(50, 300));
+	//AIAllGiftPosition.push_back(Vec2(50, 350));
+	AIAllGiftPosition.push_back(Vec2(50, 450));
+	//AIAllGiftPosition.push_back(Vec2(200, 450));
 
 	// 初始化玩家和AI分数及其他数据
 	playScore = AIScore = 0;
 	currentTime = startTime = 0;
-	tmpAIshootTime = playerDizzyTime = 0.0f;
+	tempAIshootTime = tempPlayerDizzyTime = 0.0f;
 	isTouch = isHit = false;
 
 	// cocos2dx计时器 
-	schedule(schedule_selector(Test::updateTime), 0.05);
+	schedule(schedule_selector(Level0::updateTime), 0.05);
 
 	// 获取当前可视窗口大小
 	visibleSize = director->getVisibleSize();
 
 	// 添加背景图片
-	background = Sprite::create("bg.jpg");
+	background = Sprite::create("bg0.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(background, 0);
 
 	// 添加地面刚体
 	auto ground = my_action->createNode(0, PhysicsBody::createEdgeSegment(Vec2(0, ground_height), Vec2(visibleSize.width, ground_height)), false);
 	my_action->addNode(this, ground, 1);
-	
+
 	// 添加中间挡板
 	auto brick = my_action->createSprite("brick.png", 0, Vec2(visibleSize.width / 2, 90), PhysicsBody::createBox(Size(20, 100)), false);
 	my_action->addNode(this, brick, 1);
 
 	// 添加玩家投石机  设置锚点为Sprite的左下角
-	shooter = my_action->createSprite("shooter.png", 3, playerPosition, Vec2(0, 0), 
+	shooter = my_action->createSprite("shooter.png", 3, playerPosition, Vec2(0, 0),
 		PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(20, -20)), false);
 	my_action->addNode(this, shooter, 2);
 
 	// 添加AI投石机  设置锚点为Sprite的右下角
-	AIshooter = my_action->createSprite("AIshooter.png", 6, AIPosition, Vec2(1, 0), 
+	AIshooter = my_action->createSprite("AIshooter.png", 6, AIPosition, Vec2(1, 0),
 		PhysicsBody::createCircle(25.0f, PhysicsMaterial(), Vec2(-20, -20)), false);
 	my_action->addNode(this, AIshooter, 2);
 
@@ -136,13 +122,13 @@ bool Test::init(PhysicsWorld* pw)
 	my_action->addNode(this, arrow, 2);
 
 	// 添加玩家的target
-	for (auto pos : allGiftPos) {
+	for (auto pos : allGiftPosition) {
 		auto gift = my_action->createSprite("gift.png", 2, pos, PhysicsBody::createCircle(45.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
 	// 添加AI的target
-	for (auto pos : AIAllGiftPos) {
+	for (auto pos : AIAllGiftPosition) {
 		auto gift = my_action->createSprite("AIgift.png", 5, pos, PhysicsBody::createCircle(45.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
@@ -175,10 +161,6 @@ bool Test::init(PhysicsWorld* pw)
 	this->addChild(timeLabel, 5);
 
 	// Pause按钮
-	/*auto item = MenuItemLabel::create(Label::createWithTTF("Pause", TEXT_FONT, 36));
-	item->setCallback([&](Ref* ref) {
-		doPause();
-	});*/
 	auto pause = MenuItemImage::create("pause_button.png", "pause_button_click.png");
 	pause->setCallback([&](Ref* ref) {
 		doPause();
@@ -197,19 +179,13 @@ bool Test::init(PhysicsWorld* pw)
 	return true;
 }
 
-/*
-update函数
-每隔一个dt执行一次
-dt单位是秒
-鼠标点击时改变箭头颜色
-*/
-void Test::updateTime(float dt)
+void Level0::updateTime(float dt)
 {
 	visibleSize = director->getVisibleSize();
 	currentTime += dt;  // 计时器
-	tmpAIshootTime += dt; // 记录AI射击间隔
+	tempAIshootTime += dt; // 记录AI射击间隔
 
-	// 更新时间面板
+						  // 更新时间面板
 	my_action->updateLabelTime(timeLabel, currentTime, GAME_TIME);
 	// 剩余时间为0则游戏结束
 	if (currentTime >= GAME_TIME) {
@@ -225,13 +201,13 @@ void Test::updateTime(float dt)
 
 	// test
 	/*char t[30];
-	sprintf(t, "%.1f", tmpAIshootTime);
+	sprintf(t, "%.1f", tempAIshootTime);
 	testLabel->setString(t);
 	*/
-	
+
 	if (isHit) {
-		playerDizzyTime += dt;
-		if (playerDizzyTime >= DIZZY_TIME) {
+		tempPlayerDizzyTime += dt;
+		if (tempPlayerDizzyTime >= DIZZY_TIME) {
 			isHit = false;
 			touchEvent(); // 重新创建触控监听器
 		}
@@ -240,46 +216,36 @@ void Test::updateTime(float dt)
 		my_action->arrowColor(arrow, this->getTouchTime());
 	}
 	// AI计时超过AI射击间隔则执行射击
-	if (tmpAIshootTime >= AIshootTime) {
-		tmpAIshootTime = 0.0f; // AI计时重置
+	if (tempAIshootTime >= AIshootTime_level0) {
+		tempAIshootTime = 0.0f; // AI计时重置
 		AItarget = AIselectTarget();
 
 		this->AIshooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("AIAnimation")),
-			CCCallFunc::create(CC_CALLBACK_0(Test::AIshoot, this)),
+			CCCallFunc::create(CC_CALLBACK_0(Level0::AIshoot, this)),
 			Animate::create(AnimationCache::getInstance()->getAnimation("AIAfterShoot")), NULL));
 
 		//AIshoot(AIselectTarget()); // AI射击
-		AIshootTime = random_num->getRandomNum(300, 500) / 100.0f; // AI射击频率为随机3-5S
+		AIshootTime_level0 = random_num->getRandomNum(300, 500) / 100.0f; // AI射击频率为随机3-5S
 	}
 }
 
-/*
-记录点击开始时的时间
-*/
-void Test::setStartTime()
+void Level0::setStartTime()
 {
 	startTime = currentTime;
 }
 
-/*
-计算点击持续时间=当前时间-开始时间
-*/
-float Test::getTouchTime()
+float Level0::getTouchTime()
 {
 	return currentTime - startTime;
 }
 
-/*
-触控事件
-包括 触控开始，触控移动，触控结束 三个回调函数
-*/
-void Test::touchEvent()
+void Level0::touchEvent()
 {
 	// 创建监听器
 	touchListener = EventListenerTouchOneByOne::create();
 	// 这句话不清楚什么意思。。
 	touchListener->setSwallowTouches(true);
-	
+
 	// 点击时显示箭头并旋转箭头方向，记录点击开始时间
 	touchListener->onTouchBegan = [this](Touch* touch, Event* e) {
 		this->setStartTime();
@@ -311,7 +277,7 @@ void Test::touchEvent()
 		//shooter animation
 		//Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));
 		this->shooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation")),
-			CCCallFunc::create(CC_CALLBACK_0(Test::playShoot, this)), 
+			CCCallFunc::create(CC_CALLBACK_0(Level0::playShoot, this)),
 			Animate::create(AnimationCache::getInstance()->getAnimation("playerAfterShoot")), NULL));
 
 		/*auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(20.0f));
@@ -323,10 +289,7 @@ void Test::touchEvent()
 	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(touchListener, background);
 }
 
-/*
-碰撞事件
-*/
-void Test::contactEvent()
+void Level0::contactEvent()
 {
 	// 创建碰撞监听器
 	auto listener = EventListenerPhysicsContact::create();
@@ -336,7 +299,7 @@ void Test::contactEvent()
 		// 获取发生碰撞的两个物体A,B
 		auto A = (Sprite*)contact.getShapeA()->getBody()->getNode();
 		auto B = (Sprite*)contact.getShapeB()->getBody()->getNode();
-		
+
 		/*
 		Tag 0 地面 挡板
 		Tag 1 玩家炮弹
@@ -406,7 +369,7 @@ void Test::contactEvent()
 			else {
 				giftPosition = A->getPosition();
 			}
-			
+
 			Vec2 posA = A->getPosition();
 			Vec2 posB = B->getPosition();
 			Vec2 tmp = Vec2((posA.x + posB.x) / 2, (posA.y + posB.y) / 2);
@@ -430,11 +393,11 @@ void Test::contactEvent()
 			else {
 				giftPosition = A->getPosition();
 			}
-			
+
 			// 把被命中的目标位置从AI目标列表里删除
-			for (std::vector<Vec2>::iterator it = AIAllGiftPos.begin(); it != AIAllGiftPos.end(); it++) {
+			for (std::vector<Vec2>::iterator it = AIAllGiftPosition.begin(); it != AIAllGiftPosition.end(); it++) {
 				if ((*it) == giftPosition) {
-					AIAllGiftPos.erase(it);
+					AIAllGiftPosition.erase(it);
 					break;
 				}
 			}
@@ -464,8 +427,8 @@ void Test::contactEvent()
 				my_action->spriteFadeOut(B);
 			}
 			// AI 停止攻击2s
-			if (tmpAIshootTime > AIshootTime - 1) tmpAIshootTime = AIshootTime - 1;
-			tmpAIshootTime -= DIZZY_TIME;
+			if (tempAIshootTime > AIshootTime_level0 - 1) tempAIshootTime = AIshootTime_level0 - 1;
+			tempAIshootTime -= DIZZY_TIME;
 			auto dizzy = my_action->createSprite("dizzy.png", 7, AIdizzyPosition);
 			my_action->addNode(this, dizzy, 5);
 			my_action->showDizzyPic(dizzy, DIZZY_TIME);
@@ -489,7 +452,7 @@ void Test::contactEvent()
 			*/
 			isHit = true;
 			// 开始计算眩晕时间
-			playerDizzyTime = 0.0f;
+			tempPlayerDizzyTime = 0.0f;
 			this->arrow->setVisible(false);
 			this->arrow->setColor(Color3B(255, 255, 255));
 			// 眩晕效果
@@ -525,32 +488,23 @@ void Test::contactEvent()
 	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-/*
-AI选择攻击目标，有20%概率攻击玩家投石机
-*/
-Vec2 Test::AIselectTarget()
+Vec2 Level0::AIselectTarget()
 {
 	int random = random_num->getRandomNum(1000);
 	if (random < (int)(1000 * AI_SHOOT_PLAYER_PROBABILITY)) return shooter->getPosition();
-	return AIAllGiftPos[random_num->getRandomNum(AIAllGiftPos.size())];
+	return AIAllGiftPosition[random_num->getRandomNum(AIAllGiftPosition.size())];
 }
 
-/*
-创建AI炮弹，攻击目标
-没有误差机制，必命中
-*/
-void Test::AIshoot()
+void Level0::AIshoot()
 {
-	auto v = my_action->calAIShootVelocity(AIshootPosition, AItarget, -G, AI_DEVIATION);
+	// auto v = my_action->calAIShootVelocity(AIshootPosition, AItarget, -G, AI_DEVIATION);
+	auto v = Vec2(random_num->getRandomNum(-500, -200), random_num->getRandomNum(150, 400));
 	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(BALL_RADIUS));
 	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, -360)));
 	my_action->shootAction(this, v, new_ball, 1);
 }
 
-/*
-创建player炮弹，攻击目标
-*/
-void Test::playShoot()
+void Level0::playShoot()
 {
 	auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(BALL_RADIUS));
 	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, 360)));
@@ -558,10 +512,7 @@ void Test::playShoot()
 	my_action->shootAction(this, v, new_ball, 1);
 }
 
-/*
-暂停游戏
-*/
-void Test::doPause()
+void Level0::doPause()
 {
 	//创建RenderTexture，纹理画布大小为窗口大小(800, 480)
 	auto renderTexture = RenderTexture::create(800, 480);

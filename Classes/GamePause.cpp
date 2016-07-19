@@ -5,6 +5,7 @@
 #include "start.h"
 #include "SimpleAudioEngine.h"
 #include "res.h"
+#include "Level0.h"
 
 using namespace CocosDenshion;
 
@@ -42,8 +43,8 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 	bg->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	scene->addChild(bg, 1);
 
-	auto pause = Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Pause"), TEXT_FONT, 40);
-	pause->setPosition(visibleSize.width / 2, visibleSize.height / 2 + pause->getContentSize().height * 2.5);
+	auto pause = Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Pause"), TEXT_FONT, 56);
+	pause->setPosition(visibleSize.width / 2, visibleSize.height / 2 + pause->getContentSize().height * 1.5);
 	scene->addChild(pause, 1);
 
 	auto continue_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Continue"), TEXT_FONT, 36));
@@ -62,6 +63,9 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 	auto restart_game = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/pause.xml", "Restart"), TEXT_FONT, 36));
 	restart_game->setCallback([&](Ref* ref) {
 		// 重新开始游戏
+		if (game_level == 0) {
+			my_action->changeScene(Level0::createScene());
+		}
 		if (game_level == 1) {
 			// 确定目前在玩的关卡号
 			my_action->changeScene(Test::createScene());

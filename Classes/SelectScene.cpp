@@ -2,6 +2,7 @@
 #include "test.h"
 #include "MyAction.h"
 #include "start.h"
+#include "Level0.h"
 
 #define my_action MyAction::getInstance()
 
@@ -35,11 +36,11 @@ bool SelectScene::init()
 
 	auto image1 = MenuItemImage::create("simple.png", "simple_selected.png");
 	image1->setCallback([](Ref* ref) {
-		my_action->changeScene(Test::createScene());
+		my_action->changeScene(Level0::createScene());
 	});
 	auto image2 = MenuItemImage::create("medium.png", "medium_selected.png");
 	image2->setCallback([](Ref* ref) {
-		// my_action->changeScene(::createScene());
+		my_action->changeScene(Test::createScene());
 	});
 	auto image3 = MenuItemImage::create("hard.png", "hard_selected.png");
 	image3->setCallback([](Ref* ref) {

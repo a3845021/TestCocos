@@ -3,6 +3,8 @@
 #include "test.h"
 #include "SelectScene.h"
 #include "MyAction.h"
+#include "Level0.h"
+#include "res.h"
 
 USING_NS_CC;
 
@@ -51,7 +53,12 @@ bool Win::init()
 
 	auto item1 = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/win.xml", "Restart"), TEXT_FONT, 48));
 	item1->setCallback([](Ref* ref) {
-		my_action->changeScene(Test::createScene());
+		if (game_level == 0) {
+			my_action->changeScene(Level0::createScene());
+		}
+		if (game_level == 1) {
+			my_action->changeScene(Test::createScene());
+		}
 	});
 	item1->setColor(Color3B::RED);
 	auto item2 = MenuItemLabel::create(Label::createWithTTF(my_action->getChinese("chineseXML/win.xml", "Main"), TEXT_FONT, 36));
