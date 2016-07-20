@@ -137,13 +137,13 @@ bool Test::init(PhysicsWorld* pw)
 
 	// 添加玩家的target
 	for (auto pos : allGiftPos) {
-		auto gift = my_action->createSprite("gift.png", 2, pos, PhysicsBody::createCircle(45.0f), false);
+		auto gift = my_action->createSprite("gift_small.png", 2, pos, PhysicsBody::createCircle(30.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
 	// 添加AI的target
 	for (auto pos : AIAllGiftPos) {
-		auto gift = my_action->createSprite("AIgift.png", 5, pos, PhysicsBody::createCircle(45.0f), false);
+		auto gift = my_action->createSprite("AIgift_small.png", 5, pos, PhysicsBody::createCircle(30.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
