@@ -1,4 +1,4 @@
-#include "Level0.h"
+#include "Level2.h"
 #include "MyAction.h"
 #include "RandomNum.h"
 #include "GamePause.h"
@@ -13,9 +13,9 @@
 #define INIT_SPEED 250 // 实际速度为初始速度*点击时间
 #define MAX_TOUCH_TIME 2.0f // 触控最大时间，控制最大速度
 #define DIZZY_TIME 2.0f // 被命中后眩晕时间
-#define AI_DEVIATION 0.5f //AI射击误差范围
-#define AI_SHOOT_PLAYER_PROBABILITY 0.1f // AI射击玩家概率
-#define GIFT_SCORE 50 // 每个目标的分数
+#define AI_DEVIATION 0.1f //AI射击误差范围
+#define AI_SHOOT_PLAYER_PROBABILITY 0.3f // AI射击玩家概率
+#define GIFT_SCORE 25 // 每个目标的分数
 #define G -200.0f // 重力加速度
 #define TARGET_SCORE 100 // 目标分数
 #define SCORE_FORMAT "Score:%d  AIScore:%d" // 分数字符串
@@ -32,23 +32,23 @@ const Vec2 AIdizzyPosition = Vec2(640, 150);
 
 const int ground_height = 40; // 地面高度
 
-float AIshootTime_level0 = 4.0f; // AI射击间隔
+float AIshootTime_level2 = 3.0f; // AI射击间隔
 
-float tempAIshootTime, tempPlayerDizzyTime;
-std::vector<Vec2> allGiftPosition, AIAllGiftPosition;
+float tempAIshootTime2, tempPlayerDizzyTime2;
+std::vector<Vec2> allGiftPosition2, AIAllGiftPosition2;
 
-cocos2d::Scene * Level0::createScene()
+cocos2d::Scene * Level2::createScene()
 {
 	auto scene = Scene::createWithPhysics();
 	scene->getPhysicsWorld()->setGravity(Vec2(0, G));
-	auto layer = Level0::create(scene->getPhysicsWorld());
+	auto layer = Level2::create(scene->getPhysicsWorld());
 	scene->addChild(layer);
 	return scene;
 }
 
-Level0 * Level0::create(PhysicsWorld * pw)
+Level2 * Level2::create(PhysicsWorld * pw)
 {
-	Level0* pRet = new Level0();
+	Level2* pRet = new Level2();
 	if (pRet && pRet->init(pw)) {
 		return pRet;
 	}
@@ -56,45 +56,44 @@ Level0 * Level0::create(PhysicsWorld * pw)
 	return NULL;
 }
 
-bool Level0::init(PhysicsWorld * pw)
+bool Level2::init(PhysicsWorld * pw)
 {
-
 	if (!Layer::init())
 	{
 		return false;
 	}
 
 	// 记录所在玩关卡号
-	game_level = 0;
+	game_level = 2;
 
 	// 初始化gift位置列表
-	allGiftPosition.clear();
-	AIAllGiftPosition.clear();
+	allGiftPosition2.clear();
+	AIAllGiftPosition2.clear();
 
-	allGiftPosition.push_back(Vec2(750, 300));
-	//allGiftPosition.push_back(Vec2(750, 350));
-	allGiftPosition.push_back(Vec2(750, 450));
-	//allGiftPosition.push_back(Vec2(600, 450));
+	allGiftPosition2.push_back(Vec2(700, 250));
+	allGiftPosition2.push_back(Vec2(650, 350));
+	allGiftPosition2.push_back(Vec2(650, 450));
+	allGiftPosition2.push_back(Vec2(470, 400));
 
-	AIAllGiftPosition.push_back(Vec2(50, 300));
-	//AIAllGiftPosition.push_back(Vec2(50, 350));
-	AIAllGiftPosition.push_back(Vec2(50, 450));
-	//AIAllGiftPosition.push_back(Vec2(200, 450));
+	AIAllGiftPosition2.push_back(Vec2(100, 250));
+	AIAllGiftPosition2.push_back(Vec2(150, 350));
+	AIAllGiftPosition2.push_back(Vec2(150, 450));
+	AIAllGiftPosition2.push_back(Vec2(330, 400));
 
 	// 初始化玩家和AI分数及其他数据
 	playScore = AIScore = 0;
 	currentTime = startTime = 0;
-	tempAIshootTime = tempPlayerDizzyTime = 0.0f;
+	tempAIshootTime2 = tempPlayerDizzyTime2 = 0.0f;
 	isTouch = isHit = false;
 
 	// cocos2dx计时器 
-	schedule(schedule_selector(Level0::updateTime), 0.05);
+	schedule(schedule_selector(Level2::updateTime), 0.05);
 
 	// 获取当前可视窗口大小
 	visibleSize = director->getVisibleSize();
 
 	// 添加背景图片
-	background = Sprite::create("bg0.jpg");
+	background = Sprite::create("bg.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	this->addChild(background, 0);
 
@@ -121,17 +120,20 @@ bool Level0::init(PhysicsWorld * pw)
 	arrow->setVisible(false); // 初始化时不可视
 	my_action->addNode(this, arrow, 2);
 
+	/*
 	// 添加玩家的target
-	for (auto pos : allGiftPosition) {
-		auto gift = my_action->createSprite("gift.png", 2, pos, PhysicsBody::createCircle(45.0f), false);
+	for (auto pos : allGiftPosition2) {
+		auto gift = my_action->createSprite("gift_small.png", 2, pos, PhysicsBody::createCircle(30.0f), false);
 		my_action->addNode(this, gift, 1);
 	}
 
 	// 添加AI的target
-	for (auto pos : AIAllGiftPosition) {
-		auto gift = my_action->createSprite("AIgift.png", 5, pos, PhysicsBody::createCircle(45.0f), false);
+	for (auto pos : AIAllGiftPosition2) {
+		auto gift = my_action->createSprite("AIgift_small.png", 5, pos, PhysicsBody::createCircle(30.0f), false);
 		my_action->addNode(this, gift, 1);
-	}
+	}*/
+
+	addGift();
 
 	// 显示目标分数
 	char c[30];
@@ -140,12 +142,6 @@ bool Level0::init(PhysicsWorld * pw)
 	targetLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2 + targetLabel->getContentSize().height);
 	targetLabel->setColor(Color3B::RED);
 	this->addChild(targetLabel, 5);
-
-	// test label
-	/*testLabel = Label::createWithTTF("", MARKER_FELT_TTF, 36);
-	testLabel->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	testLabel->setColor(Color3B::RED);
-	this->addChild(testLabel, 5);*/
 
 	// 显示双方分数
 	scoreLabel = Label::createWithTTF(SCORE_FORMAT, TEXT_FONT, 36);
@@ -179,11 +175,11 @@ bool Level0::init(PhysicsWorld * pw)
 	return true;
 }
 
-void Level0::updateTime(float dt)
+void Level2::updateTime(float dt)
 {
 	visibleSize = director->getVisibleSize();
 	currentTime += dt;  // 计时器
-	tempAIshootTime += dt; // 记录AI射击间隔
+	tempAIshootTime2 += dt; // 记录AI射击间隔
 
 	// 更新时间面板
 	my_action->updateLabelTime(timeLabel, currentTime, GAME_TIME);
@@ -199,15 +195,9 @@ void Level0::updateTime(float dt)
 		my_action->changeScene(Win::createScene()); // 跳转到结束界面
 	}
 
-	// test
-	/*char t[30];
-	sprintf(t, "%.1f", tempAIshootTime);
-	testLabel->setString(t);
-	*/
-
 	if (isHit) {
-		tempPlayerDizzyTime += dt;
-		if (tempPlayerDizzyTime >= DIZZY_TIME) {
+		tempPlayerDizzyTime2 += dt;
+		if (tempPlayerDizzyTime2 >= DIZZY_TIME) {
 			isHit = false;
 			touchEvent(); // 重新创建触控监听器
 		}
@@ -216,30 +206,27 @@ void Level0::updateTime(float dt)
 		my_action->arrowColor(arrow, this->getTouchTime());
 	}
 	// AI计时超过AI射击间隔则执行射击
-	if (tempAIshootTime >= AIshootTime_level0) {
-		tempAIshootTime = 0.0f; // AI计时重置
+	if (tempAIshootTime2 >= AIshootTime_level2) {
+		tempAIshootTime2 = 0.0f; // AI计时重置
 		AItarget = AIselectTarget();
 
 		this->AIshooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("AIAnimation")),
-			CCCallFunc::create(CC_CALLBACK_0(Level0::AIshoot, this)),
+			CCCallFunc::create(CC_CALLBACK_0(Level2::AIshoot, this)),
 			Animate::create(AnimationCache::getInstance()->getAnimation("AIAfterShoot")), NULL));
-
-		//AIshoot(AIselectTarget()); // AI射击
-		AIshootTime_level0 = random_num->getRandomNum(300, 500) / 100.0f; // AI射击频率为随机3-5S
 	}
 }
 
-void Level0::setStartTime()
+void Level2::setStartTime()
 {
 	startTime = currentTime;
 }
 
-float Level0::getTouchTime()
+float Level2::getTouchTime()
 {
 	return currentTime - startTime;
 }
 
-void Level0::touchEvent()
+void Level2::touchEvent()
 {
 	// 创建监听器
 	touchListener = EventListenerTouchOneByOne::create();
@@ -277,7 +264,7 @@ void Level0::touchEvent()
 		//shooter animation
 		//Animate* shooterAnimate = Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation"));
 		this->shooter->runAction(Sequence::create(Animate::create(AnimationCache::getInstance()->getAnimation("playerAnimation")),
-			CCCallFunc::create(CC_CALLBACK_0(Level0::playShoot, this)),
+			CCCallFunc::create(CC_CALLBACK_0(Level2::playShoot, this)),
 			Animate::create(AnimationCache::getInstance()->getAnimation("playerAfterShoot")), NULL));
 
 		/*auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(20.0f));
@@ -289,7 +276,7 @@ void Level0::touchEvent()
 	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(touchListener, background);
 }
 
-void Level0::contactEvent()
+void Level2::contactEvent()
 {
 	// 创建碰撞监听器
 	auto listener = EventListenerPhysicsContact::create();
@@ -395,9 +382,9 @@ void Level0::contactEvent()
 			}
 
 			// 把被命中的目标位置从AI目标列表里删除
-			for (std::vector<Vec2>::iterator it = AIAllGiftPosition.begin(); it != AIAllGiftPosition.end(); it++) {
-				if ((*it) == giftPosition) {
-					AIAllGiftPosition.erase(it);
+			for (std::vector<Vec2>::iterator it = AIAllGiftPosition2.begin(); it != AIAllGiftPosition2.end(); it++) {
+				if ((*it) == judgeTarget(giftPosition)) {
+					AIAllGiftPosition2.erase(it);
 					break;
 				}
 			}
@@ -427,8 +414,8 @@ void Level0::contactEvent()
 				my_action->spriteFadeOut(B);
 			}
 			// AI 停止攻击2s
-			if (tempAIshootTime > AIshootTime_level0 - 1) tempAIshootTime = AIshootTime_level0 - 1;
-			tempAIshootTime -= DIZZY_TIME;
+			if (tempAIshootTime2 > AIshootTime_level2 - 1) tempAIshootTime2 = AIshootTime_level2 - 1;
+			tempAIshootTime2 -= DIZZY_TIME;
 			auto dizzy = my_action->createSprite("dizzy.png", 7, AIdizzyPosition);
 			my_action->addNode(this, dizzy, 5);
 			my_action->showDizzyPic(dizzy, DIZZY_TIME);
@@ -452,7 +439,7 @@ void Level0::contactEvent()
 			*/
 			isHit = true;
 			// 开始计算眩晕时间
-			tempPlayerDizzyTime = 0.0f;
+			tempPlayerDizzyTime2 = 0.0f;
 			this->arrow->setVisible(false);
 			this->arrow->setColor(Color3B(255, 255, 255));
 			// 眩晕效果
@@ -488,23 +475,22 @@ void Level0::contactEvent()
 	director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-Vec2 Level0::AIselectTarget()
+Vec2 Level2::AIselectTarget()
 {
 	int random = random_num->getRandomNum(1000);
 	if (random < (int)(1000 * AI_SHOOT_PLAYER_PROBABILITY)) return shooter->getPosition();
-	return AIAllGiftPosition[random_num->getRandomNum(AIAllGiftPosition.size())];
+	return AIAllGiftPosition2[random_num->getRandomNum(AIAllGiftPosition2.size())];
 }
 
-void Level0::AIshoot()
+void Level2::AIshoot()
 {
-	// auto v = my_action->calAIShootVelocity(AIshootPosition, AItarget, -G, AI_DEVIATION);
-	auto v = Vec2(random_num->getRandomNum(-500, -200), random_num->getRandomNum(150, 400));
+	auto v = my_action->calAIShootVelocity(AIshootPosition, AItarget, -G, AI_DEVIATION);
 	auto new_ball = my_action->createSprite("AIbullet.png", 4, AIshootPosition, PhysicsBody::createCircle(BALL_RADIUS));
 	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, -360)));
 	my_action->shootAction(this, v, new_ball, 1);
 }
 
-void Level0::playShoot()
+void Level2::playShoot()
 {
 	auto new_ball = my_action->createSprite("bullet.png", 1, shootPosition, PhysicsBody::createCircle(BALL_RADIUS));
 	new_ball->runAction(RepeatForever::create(RotateBy::create(0.5f, 360)));
@@ -512,17 +498,49 @@ void Level0::playShoot()
 	my_action->shootAction(this, v, new_ball, 1);
 }
 
-void Level0::doPause()
+void Level2::doPause()
 {
-	//创建RenderTexture，纹理画布大小为窗口大小(800, 480)
 	auto renderTexture = RenderTexture::create(800, 480);
-
-	//遍历test类的所有子节点信息，画入renderTexture中。
-	//这里类似截图。
 	renderTexture->begin();
 	this->getParent()->visit();
 	renderTexture->end();
-
-	//将游戏界面暂停，压入场景堆栈。并切换到GamePause界面
 	director->pushScene(GamePause::createScene(renderTexture));
+}
+
+void Level2::addGift()
+{
+	addPlayerGift(Vec2(750, 250), Vec2(650, 250), 2.0f);
+	addPlayerGift(Vec2(750, 350), Vec2(550, 350), 1.5f);
+	addPlayerGift(Vec2(750, 450), Vec2(550, 450), 2.5f);
+	addPlayerGift(Vec2(470, 450), Vec2(470, 350), 1.8f);
+
+	addAIGift(Vec2(50, 250), Vec2(150, 250), 2.0f);
+	addAIGift(Vec2(50, 350), Vec2(250, 350), 1.5f);
+	addAIGift(Vec2(50, 450), Vec2(250, 450), 2.5f);
+	addAIGift(Vec2(330, 450), Vec2(330, 350), 1.8f);
+}
+
+void Level2::addPlayerGift(Vec2 Pos1, Vec2 Pos2, float d)
+{
+	auto gift = my_action->createSprite("gift_small.png", 2, Pos1, PhysicsBody::createCircle(30.0f), false);
+	auto a1 = Sequence::create(MoveTo::create(d, Pos2), MoveTo::create(d, Pos1), NULL);
+	gift->runAction(RepeatForever::create(a1));
+	my_action->addNode(this, gift, 1);
+}
+
+void Level2::addAIGift(Vec2 Pos1, Vec2 Pos2, float d)
+{
+	auto gift = my_action->createSprite("AIgift_small.png", 5, Pos1, PhysicsBody::createCircle(30.0f), false);
+	auto a1 = Sequence::create(MoveTo::create(d, Pos2), MoveTo::create(d, Pos1), NULL);
+	gift->runAction(RepeatForever::create(a1));
+	my_action->addNode(this, gift, 1);
+}
+
+Vec2 Level2::judgeTarget(Vec2 pos)
+{
+	if (pos.x == 330) return Vec2(330, 400);
+	if (pos.y == 250) return Vec2(100, 250);
+	if (pos.y == 350) return Vec2(150, 350);
+	if (pos.y == 450) return Vec2(150, 450);
+	return Vec2();
 }

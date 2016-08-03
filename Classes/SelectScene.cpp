@@ -3,6 +3,7 @@
 #include "MyAction.h"
 #include "start.h"
 #include "Level0.h"
+#include "Level2.h"
 
 #define my_action MyAction::getInstance()
 
@@ -44,7 +45,7 @@ bool SelectScene::init()
 	});
 	auto image3 = MenuItemImage::create("hard.png", "hard_selected.png");
 	image3->setCallback([](Ref* ref) {
-		// my_action->changeScene(::createScene());
+		my_action->changeScene(Level2::createScene());
 	});
 
 	auto menu = Menu::create(image1, image2, image3, NULL);

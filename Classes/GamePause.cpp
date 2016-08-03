@@ -6,6 +6,7 @@
 #include "SimpleAudioEngine.h"
 #include "res.h"
 #include "Level0.h"
+#include "Level2.h"
 
 using namespace CocosDenshion;
 
@@ -69,6 +70,9 @@ cocos2d::Scene * GamePause::createScene(RenderTexture * sqr)
 		if (game_level == 1) {
 			// 确定目前在玩的关卡号
 			my_action->changeScene(Test::createScene());
+		}
+		if (game_level == 2) {
+			my_action->changeScene(Level2::createScene());
 		}
 	});
 	restart_game->setColor(Color3B::RED);

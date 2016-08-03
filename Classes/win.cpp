@@ -4,6 +4,7 @@
 #include "SelectScene.h"
 #include "MyAction.h"
 #include "Level0.h"
+#include "Level2.h"
 #include "res.h"
 
 USING_NS_CC;
@@ -58,6 +59,9 @@ bool Win::init()
 		}
 		if (game_level == 1) {
 			my_action->changeScene(Test::createScene());
+		}
+		if (game_level == 2) {
+			my_action->changeScene(Level2::createScene());
 		}
 	});
 	item1->setColor(Color3B::RED);
